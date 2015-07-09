@@ -17,7 +17,7 @@ System.config({
 
 System.config({
   "map": {
-    "materialize": "github:FezVrasta/bootstrap-material-design@0.3.0",
+    "FezVrasta/bootstrap-material-design": "github:FezVrasta/bootstrap-material-design@0.3.0",
     "aurelia-animator-css": "github:aurelia/animator-css@0.13.0",
     "aurelia-bootstrapper": "github:aurelia/bootstrapper@0.14.0",
     "aurelia-dependency-injection": "github:aurelia/dependency-injection@0.9.0",
@@ -30,6 +30,7 @@ System.config({
     "core-js": "npm:core-js@0.9.18",
     "css": "github:systemjs/plugin-css@0.1.13",
     "font-awesome": "npm:font-awesome@4.3.0",
+    "materialize": "github:FezVrasta/bootstrap-material-design@0.3.0",
     "github:FezVrasta/bootstrap-material-design@0.3.0": {
       "css": "github:systemjs/plugin-css@0.1.13",
       "jquery": "github:components/jquery@2.1.4"

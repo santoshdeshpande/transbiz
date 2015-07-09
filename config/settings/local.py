@@ -10,6 +10,8 @@ Local settings
 
 from .common import *  # noqa
 
+CLIENT_BASE_DIR = ROOT_DIR.path("webapp")
+
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool('DJANGO_DEBUG', default=True)
@@ -60,3 +62,8 @@ INSTALLED_APPS += ('django_extensions', )
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # Your local stuff: Below this line define 3rd party library settings
+
+STATICFILES_DIRS += (
+    str(ROOT_DIR.path('webapp')),
+    str(CLIENT_BASE_DIR.path('jspm_packages'))
+)
