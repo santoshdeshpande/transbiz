@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'transbiz.users',  # custom users app
+    'transbiz.apiserver',
     # Your stuff: custom apps go here
 )
 
