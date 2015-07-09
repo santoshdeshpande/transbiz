@@ -1,4 +1,5 @@
 System.config({
+  "baseURL": "/static",
   "transpiler": "babel",
   "babelOptions": {
     "optional": [
