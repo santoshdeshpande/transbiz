@@ -19,6 +19,22 @@ class IndustryVertical(TimeStampedModel):
     description = models.TextField(null=True, blank=True)
     active = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name_plural='Industry Verticals'
+        verbose_name = 'Industry Vertical'
+
     def __unicode__(self):
         return self.name
+
+class Category(TimeStampedModel):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
+    vertical = models.ForeignKey(IndustryVertical)
+
+    class Meta:
+        verbose_name_plural = 'Categories'
+
+    def __unicode__(self):
+        return self.name
+
 
