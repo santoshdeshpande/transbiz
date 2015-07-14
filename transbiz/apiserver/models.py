@@ -7,8 +7,8 @@ from model_utils.models import TimeStampedModel
 
 class State(TimeStampedModel):
 
-    name = models.CharField(max_length=20, unique=True, verbose_name='Name of the State')
-    short_name = models.CharField(max_length=2, verbose_name='Short Name for the State(KA, MH etc)')
+    name = models.CharField(max_length=20, unique=True, verbose_name='Name of the State', blank=False)
+    short_name = models.CharField(max_length=2, verbose_name='Short Name for the State(KA, MH etc)', blank=False)
 
     def __unicode__(self):
         return self.name
