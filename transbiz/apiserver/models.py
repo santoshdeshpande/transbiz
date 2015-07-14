@@ -60,3 +60,26 @@ class SubscriptionPlan(TimeStampedModel):
 
     def __unicode__(self):
         return "%s (%d days) " % (self.name, self.duration)
+
+
+class Company(TimeStampedModel):
+    name = models.CharField(max_length=200, unique=True)
+    address_line_1 = models.CharField(max_length=200)
+    address_line_2 = models.CharField(max_length=200, blank=True)
+    city = models.ForeignKey(City)
+    state = models.ForeignKey(State)
+    pin_code = models.CharField(max_length=20)
+    landline_number = models.CharField(max_length=20)
+    tin = models.CharField(max_length=11, verbose_name='Tax-Payer Identification Number')
+    tan = models.CharField(max_length=10, verbose_name='Tax Deduction and Collection Account Number (TAN)')
+    service_tax_number = models.CharField(max_length=15)
+    ie_number = models.CharField(max_length=10, verbose_name='Import Export Code Number', blank=True)
+    website = models.URLField(blank=True)
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Companies"
+        verbose_name = "Company"
+
+    def __unicode__(self):
+        return self.name

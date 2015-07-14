@@ -1,6 +1,6 @@
 import unittest
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan,Company
 
 
 class TestCityModel(unittest.TestCase):
@@ -76,3 +76,14 @@ class TestSubscriptionPlan(unittest.TestCase):
         obj = SubscriptionPlan.objects.create(name='parvata')
         self.assertEqual(obj.duration, 0)
         self.assertEqual(obj.description, None)
+
+class TestCompanyModel(unittest.TestCase):
+    def setUp(self):
+        state,result = State.objects.get_or_create(name='Karnataka', short_name='KA')
+        self.state = state
+        self.city,result = City.objects.get_or_create(name='Bangalore', state=self.state)
+        self.default_company = Company(name='Apple', address_line_1='Somewhere',city=self.city, state=self.state, pin_code='560010',landline_number='080-35353534',tin='1111111',tan='111111111',service_tax_number='11111111',)
+
+    def test_a_valid_company_is_saved(self):
+        self.default_company.save()
+        self.assertEqual(self.default_company.name,'Apple')
