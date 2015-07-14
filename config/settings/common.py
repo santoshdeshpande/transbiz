@@ -9,6 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
+import datetime
 
 import environ
 
@@ -30,20 +31,16 @@ DJANGO_APPS = (
 
     # Useful template tags:
     # 'django.contrib.humanize',
-    'grappelli',
     # Admin
     'django.contrib.admin',
 )
 THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
-    # 'allauth',  # registration
-    # 'allauth.account',  # registration
-    # 'allauth.socialaccount',  # registration
+    'rest_framework',
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    # 'transbiz.users',  # custom users app
     'transbiz.apiserver',
     # Your stuff: custom apps go here
 )
@@ -258,3 +255,18 @@ LOGGING = {
 }
 
 # Your common stuff: Below this line define 3rd party library settings
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+}

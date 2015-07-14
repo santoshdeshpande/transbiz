@@ -1,5 +1,5 @@
 # Bleeding edge Django
-django==1.8.2
+django==1.8.3
 
 # Configuration
 django-environ==0.3.0
@@ -8,7 +8,7 @@ whitenoise==2.0.2
 
 
 # Forms
-django-braces==1.8.0
+django-braces==1.8.1
 django-crispy-forms==1.4.0
 django-floppyforms==1.4.1
 
@@ -35,9 +35,8 @@ pytz==2015.4
 # Your custom requirements go here
 
 djangorestframework
+djangorestframework-jwt
+
 markdown
 django-filter
-django-oauth-toolkit
 
-
-django-grappelli
