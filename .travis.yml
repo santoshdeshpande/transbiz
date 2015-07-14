@@ -10,3 +10,7 @@ before_script:
   - python manage.py migrate
 script:
   - python manage.py test
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/fd41d952fbc3cc79536a
