@@ -13,6 +13,17 @@ class State(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+class City(TimeStampedModel):
+
+    name = models.CharField(max_length=200, unique=True, verbose_name='Name of the city')
+    state = models.ForeignKey(State, related_name='cities')
+
+    class Meta:
+        verbose_name_plural = 'Cities'
+        verbose_name = 'City'
+
+    def __unicode__(self):
+        return self.name
 
 class IndustryVertical(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
