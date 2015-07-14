@@ -1,6 +1,6 @@
 import unittest
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan
 
 
 class TestCityModel(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestIndustryVerticalModel(unittest.TestCase):
             IndustryVertical.objects.create(active=False, description='XXXX', name=None)
 
     def test_default_create_has_active_True(self):
-        vertical = IndustryVertical.objects.create(name='Infotech')
+        vertical,result = IndustryVertical.objects.get_or_create(name='Infotech')
         self.assertEqual(vertical.active, True)
         self.assertEqual(vertical.description, None)
         self.assertEqual(vertical.name, 'Infotech')
@@ -49,3 +49,29 @@ class TestIndustryVerticalModel(unittest.TestCase):
             IndustryVertical.objects.create(name='Infotech')
 
 
+class TestCategoryModel(unittest.TestCase):
+    def test_name_is_unique(self):
+        with self.assertRaises(IntegrityError):
+            vertical, result = IndustryVertical.objects.get_or_create(name='Infotech')
+            Category.objects.create(name='Laptops', vertical=vertical)
+            Category.objects.create(name='Laptops', vertical=vertical)
+
+    def test_a_valid_category(self):
+        vertical,result = IndustryVertical.objects.get_or_create(name='Infotech')
+        obj = Category.objects.create(name='Mouse',vertical=vertical,description='Some text')
+        actual = Category.objects.get(id=obj.id)
+        self.assertIsNotNone(actual)
+        self.assertEqual(actual.name, 'Mouse')
+        self.assertEqual(actual.vertical.id, vertical.id)
+        self.assertEqual(actual.description, obj.description)
+
+class TestSubscriptionPlan(unittest.TestCase):
+    def test_name_is_unique(self):
+        with self.assertRaises(IntegrityError):
+            SubscriptionPlan.objects.create(name='sumeru')
+            SubscriptionPlan.objects.create(name='sumeru')
+
+    def test_duration_is_zero_by_default(self):
+        obj = SubscriptionPlan.objects.create(name='parvata')
+        self.assertEqual(obj.duration, 0)
+        self.assertEqual(obj.description, '')
