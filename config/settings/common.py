@@ -30,7 +30,7 @@ DJANGO_APPS = (
 
     # Useful template tags:
     # 'django.contrib.humanize',
-
+    'grappelli',
     # Admin
     'django.contrib.admin',
 )

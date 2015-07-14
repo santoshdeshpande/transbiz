@@ -37,4 +37,17 @@ class Category(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+class SubscriptionPlan(TimeStampedModel):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
+    duration = models.PositiveIntegerField(default=0, verbose_name='Number of days for this plan')
+
+    class Meta:
+        verbose_name_plural = "Subscription Plans"
+        verbose_name = "Subscription Plan"
+
+    def __unicode__(self):
+        return "%s (%d days) " % (self.name, self.duration)
+
+
 

@@ -38,3 +38,6 @@ djangorestframework
 markdown
 django-filter
 django-oauth-toolkit
+
+
+django-grappelli
