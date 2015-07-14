@@ -74,4 +74,4 @@ class TestSubscriptionPlan(unittest.TestCase):
     def test_duration_is_zero_by_default(self):
         obj = SubscriptionPlan.objects.create(name='parvata')
         self.assertEqual(obj.duration, 0)
-        self.assertEqual(obj.description, '')
+        self.assertEqual(obj.description, None)
