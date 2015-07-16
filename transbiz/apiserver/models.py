@@ -81,11 +81,10 @@ class Company(TimeStampedModel):
         verbose_name_plural = "Companies"
         verbose_name = "Company"
 
-
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         self.state = self.city.state
-        super(Company, self).save(force_insert,force_update,using,update_fields)
+        super(Company, self).save(force_insert, force_update, using, update_fields)
 
     def __unicode__(self):
         return self.name
