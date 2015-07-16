@@ -1,6 +1,7 @@
 import unittest
+import datetime
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription
 
 
 class TestCityModel(unittest.TestCase):
@@ -117,3 +118,22 @@ class TestCompanyModel(unittest.TestCase):
                                   service_tax_number='11111111', )
         company_another.save()
         self.assertEqual(company_another.state.short_name, 'KA')
+
+
+class TestSubscriptionPlan(unittest.TestCase):
+    def setUp(self):
+        self.state, result = State.objects.get_or_create(name='Karnataka', short_name='KA')
+        self.city, result = City.objects.get_or_create(name='Bangalore', state=self.state)
+        self.company, result = Company.objects.get_or_create(name='AppleSub', address_line_1='Somewhere',
+                                                             city=self.city, state=self.state,
+                                                             pin_code='560010', landline_number='080-35353534',
+                                                             tin='1111111',
+                                                             tan='111111111', service_tax_number='11111111', )
+        self.plan, result = SubscriptionPlan.objects.get_or_create(name='sumeru')
+
+    def test_a_valid_subscription(self):
+        subscription = Subscription.objects.create(plan=self.plan, company=self.company,
+                                                   start_date=datetime.date(2010, 1, 20),
+                                                   end_date=datetime.date(2020, 1, 20))
+        self.assertIsNotNone(subscription.id)
+        self.assertTrue(subscription.is_active)

@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import date
 # Create your models here.
 from model_utils.models import TimeStampedModel
 
@@ -88,3 +88,17 @@ class Company(TimeStampedModel):
 
     def __unicode__(self):
         return self.name
+
+
+class Subscription(TimeStampedModel):
+    plan = models.ForeignKey(SubscriptionPlan)
+    company = models.ForeignKey(Company)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __unicode__(self):
+        return "%s - %s" % (self.company, self.plan)
+
+    @property
+    def is_active(self):
+        return date.today() <= self.end_date
