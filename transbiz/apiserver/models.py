@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from datetime import date
 # Create your models here.
@@ -76,6 +77,9 @@ class Company(TimeStampedModel):
     ie_number = models.CharField(max_length=10, verbose_name='Import Export Code Number', blank=True)
     website = models.URLField(blank=True)
     active = models.BooleanField(default=False)
+    established_year = models.PositiveIntegerField(validators=[MinValueValidator(1950)], blank=True, null=True)
+    verified = models.BooleanField(default=False)
+
 
     class Meta:
         verbose_name_plural = "Companies"
