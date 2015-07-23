@@ -122,6 +122,7 @@ class TestCompanyModel(unittest.TestCase):
 
 class TestSubscriptionPlan(unittest.TestCase):
     def setUp(self):
+        self.vertical,result = IndustryVertical.objects.get_or_create(name="Infotech")
         self.state, result = State.objects.get_or_create(name='Karnataka', short_name='KA')
         self.city, result = City.objects.get_or_create(name='Bangalore', state=self.state)
         self.company, result = Company.objects.get_or_create(name='AppleSub', address_line_1='Somewhere',
@@ -133,6 +134,7 @@ class TestSubscriptionPlan(unittest.TestCase):
 
     def test_a_valid_subscription(self):
         subscription = Subscription.objects.create(plan=self.plan, company=self.company,
+                                                   vertical=self.vertical,
                                                    start_date=datetime.date(2010, 1, 20),
                                                    end_date=datetime.date(2020, 1, 20))
         self.assertIsNotNone(subscription.id)

@@ -97,6 +97,7 @@ class Company(TimeStampedModel):
 class Subscription(TimeStampedModel):
     plan = models.ForeignKey(SubscriptionPlan)
     company = models.ForeignKey(Company)
+    vertical = models.ForeignKey(IndustryVertical, default=None)
     start_date = models.DateField()
     end_date = models.DateField()
 
