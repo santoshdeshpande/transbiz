@@ -40,3 +40,4 @@ djangorestframework-jwt
 markdown
 django-filter
 
+django-cors-headers

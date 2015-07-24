@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
 from django.db import models
 from datetime import date
@@ -124,7 +125,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email,mobile_no=mobile_no,
+        user = self.model(email=email, mobile_no=mobile_no,
                           is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser,
                           date_joined=now, **extra_fields)
@@ -137,7 +138,8 @@ class UserManager(BaseUserManager):
                                  **extra_fields)
 
     def create_superuser(self, email, mobile_no, password, **extra_fields):
-        return self._create_user(email, mobile_no, password, True, True,
+        company = Company.objects.get(name__exact='Optibiz')
+        return self._create_user(email, mobile_no, password, True, True, company=company,
                                  **extra_fields)
 
 
@@ -161,6 +163,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['mobile_no']
 
     objects = UserManager()
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super(User, self).save(force_insert, force_update, using, update_fields)
 
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
