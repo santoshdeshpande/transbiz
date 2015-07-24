@@ -1,49 +1,30 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
-from django.core.urlresolvers import reverse
-from django.views.generic import DetailView, ListView, RedirectView, UpdateView
-
-from braces.views import LoginRequiredMixin
-
-from .forms import UserForm
-from .models import User
+from rest_framework.decorators import list_route
+from .serializers import StateSerializer, CitySerializer, UserSerializer
+from rest_framework import viewsets
+from .models import State, City, User
+from rest_framework.response import Response
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    # slug_field = "username"
-    # slug_url_kwarg = "username"
+class StateViewSet(viewsets.ModelViewSet):
+    serializer_class = StateSerializer
+    queryset = State.objects.all()
 
 
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
-
-    def get_redirect_url(self):
-        return reverse("users:detail",
-                       kwargs={"username": self.request.user.username})
+class CityViewSet(viewsets.ModelViewSet):
+    serializer_class = CitySerializer
+    queryset = City.objects.all()
 
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
-    form_class = UserForm
+    def get_queryset(self):
+        user = self.request.user
+        return User.objects.filter(company=user.company)
 
-    # we already imported User in the view code above, remember?
-    model = User
-
-    # send the user back to their own page after a successful update
-    def get_success_url(self):
-        return reverse("users:detail",
-                       kwargs={"email": self.request.user.email})
-
-    def get_object(self):
-        # Only get the User record for the user making the request
-        return User.objects.get(email=self.request.user.email)
-
-
-class UserListView(LoginRequiredMixin, ListView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    # slug_field = "username"
-    # slug_url_kwarg = "username"
+    @list_route()
+    def profile(self, request):
+        current_user = User.objects.get(pk=request.user.id)
+        serializer = self.get_serializer(current_user)
+        return Response(serializer.data)

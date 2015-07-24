@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     # User management
-    # url(r'^users/', include("transbiz.users.urls", namespace="users")),
+    url(r'^api/v1/', include("transbiz.apiserver.urls", namespace="api")),
     # url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
