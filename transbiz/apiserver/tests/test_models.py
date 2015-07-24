@@ -9,8 +9,8 @@ class TestCityModel(unittest.TestCase):
         pass
 
     def test_city_does_not_allow_duplicate_names(self):
-        self.state = State.objects.create(name='Karnataka', short_name='KA')
-        city = City.objects.create(name='Bangalore', state=self.state)
+        self.state = State.objects.create(name='Karnatak', short_name='KA')
+        city = City.objects.create(name='Bangaloe', state=self.state)
         self.assertIsNotNone(city, "A city object should have been created")
         city = City(name='Bangalore', state=self.state)
         with self.assertRaises(IntegrityError):
