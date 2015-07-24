@@ -1,9 +1,9 @@
 from rest_framework.decorators import list_route
-from .serializers import StateSerializer, CitySerializer, UserSerializer
+from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer
 from rest_framework import viewsets
-from .models import State, City, User
+from .models import State, City, User, Company
 from rest_framework.response import Response
-
+from django.conf import settings
 
 class StateViewSet(viewsets.ModelViewSet):
     serializer_class = StateSerializer
@@ -13,6 +13,17 @@ class StateViewSet(viewsets.ModelViewSet):
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     queryset = City.objects.all()
+
+
+class CompanyViewSet(viewsets.ModelViewSet):
+    serializer_class = CompanySerializer
+    queryset = Company.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.company == settings.TRANSBIZ_COMPANY_NAME:
+            return self.queryset
+        return Company.objects.filter(pk=user.company.id)
 
 
 class UserViewSet(viewsets.ModelViewSet):

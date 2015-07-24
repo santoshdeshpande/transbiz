@@ -8,11 +8,12 @@ except ImportError:  # django < 1.4
 
 # place app url patterns here
 router = DefaultRouter()
-router.register('states',StateViewSet)
-router.register('cities',CityViewSet)
-router.register('users',UserViewSet)
+router.register('states', StateViewSet)
+router.register('cities', CityViewSet)
+router.register('users', UserViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
+
 ]
