@@ -3,6 +3,10 @@ from django.db import models
 from datetime import date
 # Create your models here.
 from model_utils.models import TimeStampedModel
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.utils.translation import ugettext_lazy as _
+from django.utils import six, timezone
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 
 class State(TimeStampedModel):
@@ -80,7 +84,6 @@ class Company(TimeStampedModel):
     established_year = models.PositiveIntegerField(validators=[MinValueValidator(1950)], blank=True, null=True)
     verified = models.BooleanField(default=False)
 
-
     class Meta:
         verbose_name_plural = "Companies"
         verbose_name = "Company"
@@ -107,3 +110,64 @@ class Subscription(TimeStampedModel):
     @property
     def is_active(self):
         return date.today() <= self.end_date
+
+
+class UserManager(BaseUserManager):
+    use_in_migrations = True
+
+    def _create_user(self, email, mobile_no, password,
+                     is_staff, is_superuser, **extra_fields):
+        """
+        Creates and saves a User with the given username, email and password.
+        """
+        now = timezone.now()
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email,mobile_no=mobile_no,
+                          is_staff=is_staff, is_active=True,
+                          is_superuser=is_superuser,
+                          date_joined=now, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, mobile_no=None, password=None, **extra_fields):
+        return self._create_user(email, mobile_no, password, False, False,
+                                 **extra_fields)
+
+    def create_superuser(self, email, mobile_no, password, **extra_fields):
+        return self._create_user(email, mobile_no, password, True, True,
+                                 **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField('Email Address', unique=True, error_messages={
+        'unique': _("A user with that email address already exists."),
+    })
+    mobile_no = models.CharField(max_length=13)
+    first_name = models.CharField(max_length=70)
+    last_name = models.CharField(max_length=70)
+    company = models.ForeignKey(Company, blank=True, related_name='users', null=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,
+                                   help_text=_('Designates whether the user can log into this admin '
+                                               'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+                                    help_text=_('Designates whether this user should be treated as '
+                                                'active. Unselect this instead of deleting accounts.'))
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['mobile_no']
+
+    objects = UserManager()
+
+    def get_full_name(self):
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        send_mail(subject, message, from_email, [self.email], **kwargs)
