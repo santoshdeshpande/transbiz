@@ -41,3 +41,4 @@ markdown
 django-filter
 
 django-cors-headers
+model_mommy

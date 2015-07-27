@@ -206,8 +206,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'transbiz.apiserver.auth_backends.MobileAuthBackend'
+    'transbiz.apiserver.auth_backends.MobileAuthBackend',
+    'transbiz.apiserver.auth_backends.EmailAuthBackend'
     # 'allauth.account.auth_backends.AuthenticationBackend',
 )
 
