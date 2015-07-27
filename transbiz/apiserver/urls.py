@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from .views import StateViewSet, CityViewSet, UserViewSet
+from .views import StateViewSet, CityViewSet, UserViewSet, CompanyViewSet
 
 try:
     from django.conf.urls import *
@@ -11,6 +11,7 @@ router = DefaultRouter()
 router.register('states', StateViewSet)
 router.register('cities', CityViewSet)
 router.register('users', UserViewSet)
+router.register('companies', CompanyViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

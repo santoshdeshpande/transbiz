@@ -10,7 +10,7 @@ class TestMobileAuthBackend(unittest.TestCase):
         self.user1.save()
         self.backend = MobileAuthBackend()
 
-    def xtest_backend_checks_with_mobile_number(self):
+    def test_backend_checks_with_mobile_number(self):
         user = self.backend.authenticate(email='999', password='test123')
         self.assertIsNotNone(user)
         self.assertEqual(self.user1.email, user.email)

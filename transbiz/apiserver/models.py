@@ -8,7 +8,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six, timezone
 from django.utils.translation import ugettext, ugettext_lazy as _
-
+from django.conf import settings
 
 class State(TimeStampedModel):
     name = models.CharField(max_length=20, unique=True, verbose_name='Name of the State', blank=False)
@@ -94,13 +94,20 @@ class Company(TimeStampedModel):
         self.state = self.city.state
         super(Company, self).save(force_insert, force_update, using, update_fields)
 
+    @property
+    def has_valid_subscriptions(self):
+        for subscription in self.subscriptions.all():
+            if subscription.is_active:
+                return True
+        return False
+
     def __unicode__(self):
         return self.name
 
 
 class Subscription(TimeStampedModel):
     plan = models.ForeignKey(SubscriptionPlan)
-    company = models.ForeignKey(Company)
+    company = models.ForeignKey(Company, related_name='subscriptions')
     vertical = models.ForeignKey(IndustryVertical, default=None)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -138,7 +145,7 @@ class UserManager(BaseUserManager):
                                  **extra_fields)
 
     def create_superuser(self, email, mobile_no, password, **extra_fields):
-        company = Company.objects.get(name__exact='Optibiz')
+        company = Company.objects.get(name__exact=settings.TRANSBIZ_COMPANY_NAME)
         return self._create_user(email, mobile_no, password, True, True, company=company,
                                  **extra_fields)
 
@@ -177,3 +184,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def _belongs_to_optibiz(self):
+        return self.company.name == settings.TRANSBIZ_COMPANY_NAME
+
+    def is_valid_login(self):
+        if self._belongs_to_optibiz():
+            return True
+        return self.company.has_valid_subscriptions

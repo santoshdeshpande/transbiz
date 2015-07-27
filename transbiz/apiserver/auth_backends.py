@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
-
 class MobileAuthBackend(ModelBackend):
     def authenticate(self, username=None, password=None, **kwargs):
         userModel = get_user_model()
@@ -9,7 +8,7 @@ class MobileAuthBackend(ModelBackend):
             username = kwargs.get("email")
         try:
             user = userModel._default_manager.get(mobile_no__exact=username)
-            if user.check_password(password):
+            if user.is_valid_login() and user.check_password(password):
                 return user
         except userModel.DoesNotExist:
             # Run the default password hasher once to reduce the timing
