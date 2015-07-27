@@ -15,6 +15,7 @@ class EmailAuthBackend(ModelBackend):
             # difference between an existing and a non-existing user (#20760).
             userModel().set_password(password)
 
+
 class MobileAuthBackend(ModelBackend):
     def authenticate(self, username=None, password=None, **kwargs):
         userModel = get_user_model()

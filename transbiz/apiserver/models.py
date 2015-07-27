@@ -101,6 +101,10 @@ class Company(TimeStampedModel):
                 return True
         return False
 
+    @property
+    def is_active(self):
+        return self.active and self.verified
+
     def __unicode__(self):
         return self.name
 
@@ -191,4 +195,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_valid_login(self):
         if self._belongs_to_optibiz():
             return True
-        return self.company.has_valid_subscriptions
+        return self.company.is_active and self.company.has_valid_subscriptions
