@@ -84,6 +84,7 @@ class Company(TimeStampedModel):
     active = models.BooleanField(default=False)
     established_year = models.PositiveIntegerField(validators=[MinValueValidator(1950)], blank=True, null=True)
     verified = models.BooleanField(default=False)
+    logo = models.ImageField(blank=True, null=True, upload_to='logos')
 
     class Meta:
         verbose_name_plural = "Companies"
