@@ -1,7 +1,8 @@
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
-from datetime import date
+from datetime import date, timedelta
 # Create your models here.
 from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
@@ -9,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import six, timezone
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.conf import settings
+
 
 class State(TimeStampedModel):
     name = models.CharField(max_length=20, unique=True, verbose_name='Name of the State', blank=False)
@@ -109,6 +111,18 @@ class Company(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+class Brand(TimeStampedModel):
+    name = models.CharField(max_length=50, verbose_name="Name of the model")
+    category = models.ForeignKey(Category)
+
+    class Meta:
+        verbose_name_plural = "Brands"
+        verbose_name = "Brand"
+        unique_together = ('name','category')
+
+    def __unicode__(self):
+        return self.name
+
 
 class Subscription(TimeStampedModel):
     plan = models.ForeignKey(SubscriptionPlan)
@@ -123,6 +137,51 @@ class Subscription(TimeStampedModel):
     @property
     def is_active(self):
         return date.today() <= self.end_date
+
+
+def get_end_date():
+    return timezone.now() + timedelta(days=DEFAULT_SALE_TIME)
+
+
+class Sale(TimeStampedModel):
+
+    uom = (
+    ('pcs','Pieces'),
+    ('pcks','Packs'),)
+
+    company = models.ForeignKey(Company)
+    category = models.ForeignKey(Category)
+    brand = models.ForeignKey(Brand)
+    model = models.CharField(max_length=50)
+    description = models.CharField(max_length=200, blank=True)
+    min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
+    unit_of_measure = models.CharField(max_length=10,choices=uom)
+    price_in_inr = models.PositiveIntegerField(default=0)
+    new = models.BooleanField(default = True)
+    refurbished = models.BooleanField(default = True)
+    warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months",default=0)
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default= get_end_date)
+    shipped_to = models.ManyToManyField(City)
+    box_contents = models.CharField(max_length=200, blank="True")
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural="Sales"
+        verbose_name = "Sale"
+
+    def clean(self):
+        super(Sale,self).clean()
+        if self.start_date < timezone.now().date():
+            raise ValidationError('Start date cannot be in the past')
+
+    def __unicode__(self):
+        return "%s/%s/%s" % (self.brand, self.category, self.model)
+
+    @property
+    def is_active(self):
+        date_now = date.today()
+        return (self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date()))
 
 
 class UserManager(BaseUserManager):

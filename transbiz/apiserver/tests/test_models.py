@@ -1,8 +1,8 @@
 import unittest
 import datetime
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription
-
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale
+from config.settings.common import DEFAULT_SALE_TIME
 
 class TestCityModel(unittest.TestCase):
     def setUp(self):
@@ -139,3 +139,126 @@ class TestSubscriptionPlan(unittest.TestCase):
                                                    end_date=datetime.date(2020, 1, 20))
         self.assertIsNotNone(subscription.id)
         self.assertTrue(subscription.is_active)
+
+
+class TestBrandModel(unittest.TestCase):
+
+    def setUp(self):
+        self.vertical, result = IndustryVertical.objects.get_or_create(name='Infotech')
+        self.category, result = Category.objects.get_or_create(name="Laptop",vertical=self.vertical)
+        self.brand, result = Brand.objects.get_or_create(name="Acer", category = self.category)
+
+    def test_a_valid_brand(self):
+        self.assertEqual(self.brand.name, 'Acer')
+        self.assertEqual(self.brand.category,self.category)
+
+    def test_name_category_pair_must_be_unique(self):
+        category_another = Category.objects.create(name="Harddisk",vertical=self.vertical)
+        brand2 = Brand.objects.create(name="Acer", category = category_another)
+        self.assertIsNotNone(self.brand)
+        self.assertIsNotNone(brand2)
+
+    def test_name_is_unique_for_a_category(self):
+        with self.assertRaises(IntegrityError):
+            Brand.objects.create(name="Acer", category = self.category)
+
+class TestSaleModel(unittest.TestCase):
+
+    def setUp(self):
+        self.state, result = State.objects.get_or_create(name='Karnataka', short_name='KA')
+        self.city, result = City.objects.get_or_create(name='Bangalore', state=self.state)
+        self.vertical, result = IndustryVertical.objects.get_or_create(name='Infotech')
+        self.category, result = Category.objects.get_or_create(name="Laptop",vertical=self.vertical)
+        self.company, result = Company.objects.get_or_create(name='AppleSub', address_line_1='Somewhere',
+                                                             city=self.city, state=self.state,
+                                                             pin_code='560010', landline_number='080-35353534',
+                                                             tin='1111111',
+                                                             tan='111111111', service_tax_number='11111111')
+        self.brand, result = Brand.objects.get_or_create(name="iOS", category = self.category)
+        self.start_date = datetime.datetime.now()
+        self.end_date = datetime.datetime.now() + datetime.timedelta(days = 7)
+        self.sale = Sale(company= self.company, category = self.category,
+                         brand = self.brand, model = "proair", min_quantity = 2,
+                         unit_of_measure = "pcs",price_in_inr = 24000,
+                         new = True, refurbished = True, warranty = 24,
+                         start_date=self.start_date, 
+                         end_date = self.end_date,
+                         active = False )
+
+
+    def test_a_valid_sale(self):
+        self.assertEqual(self.sale.company, self.company)
+        self.assertEqual(self.sale.category, self.category)
+        self.assertEqual(self.sale.brand, self.brand)
+        self.assertEqual(self.sale.model, "proair")
+        self.assertEqual(self.sale.min_quantity, 2)
+        self.assertEqual(self.sale.unit_of_measure, "pcs")
+        self.assertEqual(self.sale.price_in_inr, 24000)
+        self.assertTrue(self.sale.new)
+        self.assertTrue(self.sale.refurbished)
+        self.assertEqual(self.sale.warranty, 24)
+        self.assertEqual(self.sale.start_date, self.start_date)
+        self.assertEqual(self.sale.end_date, self.end_date)
+        self.assertFalse(self.sale.active)
+        self.assertFalse(self.sale.is_active)
+
+    def test_not_valid_if_min_quantity_is_negative(self):
+        with self.assertRaises(IntegrityError):
+            self.sale.min_quantity = -4
+            self.sale.save()
+
+    def test_not_valid_if_company_is_missing(self):
+        with self.assertRaises(IntegrityError):
+            another_sale = Sale(category = self.category,
+                                brand = self.brand, model = "proair", min_quantity = 2,
+                                unit_of_measure = "pcs",price_in_inr = 24000,
+                                new = True, refurbished = True, warranty = 24,
+                                start_date= self.start_date, 
+                                end_date = self.end_date,
+                                active = False )
+            another_sale.save()
+
+    def test_not_valid_if_category_is_missing(self):
+        with self.assertRaises(IntegrityError):
+            another_sale = Sale(company = self.company,
+                                brand = self.brand, model = "proair", min_quantity = 2,
+                                unit_of_measure = "pcs",price_in_inr = 24000,
+                                new = True, refurbished = True, warranty = 24,
+                                start_date= self.start_date, 
+                                end_date = self.end_date,
+                                active = False )
+            another_sale.save()
+
+    def test_not_valid_if_model_is_missing(self):
+        with self.assertRaises(IntegrityError):
+            another_sale = Sale(category = self.category,company = self.company,
+                                brand = self.brand, min_quantity = 2,
+                                model = None,
+                                unit_of_measure = "pcs",price_in_inr = 24000,
+                                new = True, refurbished = True, warranty = 24,
+                                start_date= self.start_date, 
+                                end_date = self.end_date,
+                                active = False )
+            another_sale.save()
+
+    def test_not_valid_if_brand_is_missing(self):
+        with self.assertRaises(IntegrityError):
+            another_sale = Sale(category = self.category,company = self.company,
+                                model="proair", min_quantity = 2,
+                                unit_of_measure = "pcs",price_in_inr = 24000,
+                                new = True, refurbished = True, warranty = 24,
+                                start_date= self.start_date, 
+                                end_date = self.end_date,
+                                active = False )
+            another_sale.save()
+
+    def test_not_valid_is_active(self):
+        another_sale = Sale(category = self.category,company = self.company,
+                            model="proair", min_quantity = 2,
+                            brand = self.brand,
+                            unit_of_measure = "pcs",price_in_inr = 24000,
+                            new = True, refurbished = True, warranty = 24,
+                            start_date= self.start_date + datetime.timedelta(days = DEFAULT_SALE_TIME), 
+                            end_date = self.end_date,
+                            active = False )
+        self.assertFalse(another_sale.is_active)
