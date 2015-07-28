@@ -1,14 +1,17 @@
+from datetime import date
+
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
+from django.db import models, IntegrityError
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import date, timedelta
 # Create your models here.
 from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils import six, timezone
-from django.utils.translation import ugettext, ugettext_lazy as _
 from django.conf import settings
 
 
@@ -124,6 +127,13 @@ class Brand(TimeStampedModel):
         return self.name
 
 
+class SubscriptionManager(models.Manager):
+    def has_overlapped_subscriptions(self, start_date, end_date, vertical):
+        overlapped_on_start = self.get_queryset().filter(vertical__id=vertical.id, start_date__range=[start_date, end_date]).count()
+        overlapped_on_end = self.get_queryset().filter(vertical_id=vertical.id, end_date__range=[start_date, end_date]).count()
+        return (overlapped_on_start + overlapped_on_end) > 0
+
+
 class Subscription(TimeStampedModel):
     plan = models.ForeignKey(SubscriptionPlan)
     company = models.ForeignKey(Company, related_name='subscriptions')
@@ -131,11 +141,21 @@ class Subscription(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
 
+    objects = SubscriptionManager()
+
     def __unicode__(self):
         return "%s - %s" % (self.company, self.plan)
 
     @property
     def is_active(self):
+        return self.end_date >= date.today() >= self.start_date
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        # print self.instance
+        if Subscription.objects.has_overlapped_subscriptions(self.start_date, self.end_date, self.vertical):
+            raise IntegrityError(9004, "There are overlapping subscriptions")
+        super(Subscription, self).save(force_insert, force_update, using, update_fields)
         return date.today() <= self.end_date
 
 
