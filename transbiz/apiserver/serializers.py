@@ -18,10 +18,12 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
         model = SubscriptionPlan
         fields = ('id', 'name', 'description', 'duration')
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id','email','mobile_no','first_name', 'last_name', 'company','date_joined')
+        fields = ('id', 'email', 'mobile_no', 'first_name', 'last_name', 'company', 'date_joined')
+
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:

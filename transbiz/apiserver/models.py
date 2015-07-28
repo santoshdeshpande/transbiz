@@ -114,6 +114,7 @@ class Company(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+
 class Brand(TimeStampedModel):
     name = models.CharField(max_length=50, verbose_name="Name of the model")
     category = models.ForeignKey(Category)
@@ -121,7 +122,7 @@ class Brand(TimeStampedModel):
     class Meta:
         verbose_name_plural = "Brands"
         verbose_name = "Brand"
-        unique_together = ('name','category')
+        unique_together = ('name', 'category')
 
     def __unicode__(self):
         return self.name
@@ -129,8 +130,10 @@ class Brand(TimeStampedModel):
 
 class SubscriptionManager(models.Manager):
     def has_overlapped_subscriptions(self, start_date, end_date, vertical):
-        overlapped_on_start = self.get_queryset().filter(vertical__id=vertical.id, start_date__range=[start_date, end_date]).count()
-        overlapped_on_end = self.get_queryset().filter(vertical_id=vertical.id, end_date__range=[start_date, end_date]).count()
+        overlapped_on_start = self.get_queryset().filter(vertical__id=vertical.id,
+                                                         start_date__range=[start_date, end_date]).count()
+        overlapped_on_end = self.get_queryset().filter(vertical_id=vertical.id,
+                                                       end_date__range=[start_date, end_date]).count()
         return (overlapped_on_start + overlapped_on_end) > 0
 
 
@@ -154,7 +157,7 @@ class Subscription(TimeStampedModel):
              update_fields=None):
         # print self.instance
         if Subscription.objects.has_overlapped_subscriptions(self.start_date, self.end_date, self.vertical):
-            raise IntegrityError(9004, "There are overlapping subscriptions")
+            raise ValidationError("There are overlapping subscriptions")
         super(Subscription, self).save(force_insert, force_update, using, update_fields)
         return date.today() <= self.end_date
 
@@ -164,10 +167,9 @@ def get_end_date():
 
 
 class Sale(TimeStampedModel):
-
     uom = (
-    ('pcs','Pieces'),
-    ('pcks','Packs'),)
+        ('pcs', 'Pieces'),
+        ('pcks', 'Packs'),)
 
     company = models.ForeignKey(Company)
     category = models.ForeignKey(Category)
@@ -175,23 +177,23 @@ class Sale(TimeStampedModel):
     model = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True)
     min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
-    unit_of_measure = models.CharField(max_length=10,choices=uom)
+    unit_of_measure = models.CharField(max_length=10, choices=uom)
     price_in_inr = models.PositiveIntegerField(default=0)
-    new = models.BooleanField(default = True)
-    refurbished = models.BooleanField(default = True)
-    warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months",default=0)
+    new = models.BooleanField(default=True)
+    refurbished = models.BooleanField(default=True)
+    warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months", default=0)
     start_date = models.DateField(default=timezone.now)
-    end_date = models.DateField(default= get_end_date)
+    end_date = models.DateField(default=get_end_date)
     shipped_to = models.ManyToManyField(City)
     box_contents = models.CharField(max_length=200, blank="True")
     active = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name_plural="Sales"
+        verbose_name_plural = "Sales"
         verbose_name = "Sale"
 
     def clean(self):
-        super(Sale,self).clean()
+        super(Sale, self).clean()
         if self.start_date < timezone.now().date():
             raise ValidationError('Start date cannot be in the past')
 
@@ -201,7 +203,7 @@ class Sale(TimeStampedModel):
     @property
     def is_active(self):
         date_now = date.today()
-        return (self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date()))
+        return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
 
 
 class UserManager(BaseUserManager):
@@ -233,6 +235,12 @@ class UserManager(BaseUserManager):
         return self._create_user(email, mobile_no, password, True, True, company=company,
                                  **extra_fields)
 
+    def can_create_more_users(self, company):
+        if company.name == settings.TRANSBIZ_COMPANY_NAME:
+            return True
+        all_users = self.get_queryset().filter(company__id=company.id).count()
+        return all_users <= settings.DEFAULT_USER_CREATION_COUNT
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('Email Address', unique=True, error_messages={
@@ -255,8 +263,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    def clean(self):
+        if not User.objects.can_create_more_users(self.company):
+            raise ValidationError("The maximum number of users for this company has reached")
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        if not User.objects.can_create_more_users(self.company):
+            raise ValidationError("The maximum number of users for this company has reached")
         super(User, self).save(force_insert, force_update, using, update_fields)
 
     def get_full_name(self):
