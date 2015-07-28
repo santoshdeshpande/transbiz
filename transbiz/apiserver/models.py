@@ -140,7 +140,7 @@ class Subscription(TimeStampedModel):
 
 
 def get_end_date():
-    return timezone.now() + timedelta(days=DEFAULT_SALE_TIME)
+    return timezone.now() + timedelta(days=settings.DEFAULT_SALE_TIME)
 
 
 class Sale(TimeStampedModel):
