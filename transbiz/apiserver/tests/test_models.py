@@ -1,7 +1,8 @@
 import unittest
 import datetime
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale, PushNotification, User
+from django.core.exceptions import ValidationError
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale, PushNotification, User, ProductImage
 from config.settings.common import DEFAULT_SALE_TIME
 
 class TestCityModel(unittest.TestCase):
@@ -283,7 +284,7 @@ class TestPushNotificationModel(unittest.TestCase):
                                                                            mobile_make="Nokia",
                                                                            mobile_model="abc123",
                                                                            os_version = "os5",
-                                                                           app_version = 3.02)
+                                                                           app_version = "3.02")
     def test_a_valid_push_notification(self):
         self.assertEqual(self.push_notification.user, self.user)
         self.assertEqual(self.push_notification.gcm_id,"abc123")
@@ -292,14 +293,45 @@ class TestPushNotificationModel(unittest.TestCase):
         self.assertEqual(self.push_notification.mobile_make,"Nokia")
         self.assertEqual(self.push_notification.mobile_model,"abc123")
         self.assertEqual(self.push_notification.os_version,"os5")
-        self.assertEqual(self.push_notification.app_version,3.02)
+        self.assertEqual(self.push_notification.app_version,"3.02")
 
     def test_not_vaild_if_user_is_missing(self):
-        with self.assertRaises(IntegrityError):
-            another_push_notification = PushNotification.objects.get_or_create(gcm_id = "abc123",
+        with self.assertRaises(ValueError):
+            another_push_notification = PushNotification.objects.get_or_create(user=None,
+                                                                               gcm_id = "abc123",
                                                                                imei_no="329478",
                                                                                phone_no="123123",
                                                                                mobile_make="Nokia",
                                                                                mobile_model="abc123",
                                                                                os_version = "os5",
-                                                                               app_version = 3.02)
+                                                                               app_version = "3.02")
+
+class TestProductImage(unittest.TestCase):
+
+    def setUp(self):
+        self.state, result = State.objects.get_or_create(name='Karnataka', short_name='KA')
+        self.city, result = City.objects.get_or_create(name='Bangalore', state=self.state)
+        self.vertical, result = IndustryVertical.objects.get_or_create(name='Infotech')
+        self.category, result = Category.objects.get_or_create(name="Laptop",vertical=self.vertical)
+        self.company, result = Company.objects.get_or_create(name='AppleSub', address_line_1='Somewhere',
+                                                             city=self.city, state=self.state,
+                                                             pin_code='560010', landline_number='080-35353534',
+                                                             tin='1111111',
+                                                             tan='111111111', service_tax_number='11111111')
+        self.brand, result = Brand.objects.get_or_create(name="iOS", category = self.category)
+        self.start_date = datetime.datetime.now()
+        self.end_date = datetime.datetime.now() + datetime.timedelta(days = 7)
+        self.sale, result = Sale.objects.get_or_create(company= self.company, category = self.category,
+                                                       brand = self.brand, model = "proair", min_quantity = 2,
+                                                       unit_of_measure = "pcs",price_in_inr = 24000,
+                                                       new = True, refurbished = True, warranty = 24,
+                                                       start_date=self.start_date, 
+                                                       end_date = self.end_date,
+                                                       active = False )
+        self.productimage1 = ProductImage.objects.create(product=self.sale, order=23)
+        self.productimage2 = ProductImage.objects.create(product=self.sale, order=235)
+        self.productimage3 = ProductImage.objects.create(product=self.sale, order=231)
+
+    def test_a_valid_Product_Image(self):
+        self.assertEqual(self.productimage1.product, self.sale)
+        self.assertEqual(self.productimage1.order, 23)

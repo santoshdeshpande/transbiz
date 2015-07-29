@@ -39,6 +39,7 @@ class IndustryVertical(TimeStampedModel):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
     active = models.BooleanField(default=True)
+    logo_image = models.ImageField(blank=True, null=True, upload_to='vertical_logo', verbose_name="Verical Logo")
 
     class Meta:
         verbose_name_plural = 'Industry Verticals'
@@ -214,8 +215,7 @@ class PushNotification(TimeStampedModel):
     mobile_make = models.CharField(max_length = 50)
     mobile_model = models.CharField(max_length = 50)
     os_version = models.CharField(max_length = 50)
-    app_version = models.DecimalField(max_digits=4, decimal_places=2, verbose_name="Application Version", 
-                                      validators=[MinValueValidator(0.01)])
+    app_version = models.CharField(max_length= 10)
 
     class Meta:
         verbose_name_plural = "Push Notifications"
@@ -225,6 +225,29 @@ class PushNotification(TimeStampedModel):
         return unicode(self.user)
 
     
+class ProductImage(TimeStampedModel):
+    product = models.ForeignKey(Sale, related_name="images")
+    image = models.ImageField(upload_to='prod_image', blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name_plural = "Product Images"
+        verbose_name = "ProductImage"
+
+    def __unicode__(self):
+        return "%s - %s" % (self.product, self.order)
+
+    def clean(self):
+        if not self.validate_number_of_images_per_sale():
+            raise ValidationError("Limit on number of images for %s has been reached" % self.product)
+
+
+    def validate_number_of_images_per_sale(self):
+        count = ProductImage.objects.filter(product=self.product).count()
+        if count >= 3:
+            return False
+        return True
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
