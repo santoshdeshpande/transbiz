@@ -206,6 +206,26 @@ class Sale(TimeStampedModel):
         return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
 
 
+class PushNotification(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    gcm_id = models.CharField(max_length = 30)
+    imei_no = models.CharField(max_length= 16)
+    phone_no = models.CharField(max_length = 10, blank = True)
+    mobile_make = models.CharField(max_length = 50)
+    mobile_model = models.CharField(max_length = 50)
+    os_version = models.CharField(max_length = 50)
+    app_version = models.DecimalField(max_digits=4, decimal_places=2, verbose_name="Application Version", 
+                                      validators=[MinValueValidator(0.01)])
+
+    class Meta:
+        verbose_name_plural = "Push Notifications"
+        verbose_name = "Push Notification"
+
+    def __unicode__(self):
+        return unicode(self.user)
+
+    
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 

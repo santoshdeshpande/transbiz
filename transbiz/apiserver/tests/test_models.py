@@ -1,7 +1,7 @@
 import unittest
 import datetime
 from django.db import IntegrityError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale, PushNotification, User
 from config.settings.common import DEFAULT_SALE_TIME
 
 class TestCityModel(unittest.TestCase):
@@ -262,3 +262,44 @@ class TestSaleModel(unittest.TestCase):
                             end_date = self.end_date,
                             active = False )
         self.assertFalse(another_sale.is_active)
+
+
+class TestPushNotificationModel(unittest.TestCase):
+    def setUp(self):
+        self.state, result = State.objects.get_or_create(name='Karnataka', short_name='KA')
+        self.city, result = City.objects.get_or_create(name='Bangalore', state=self.state)
+        self.company, result = Company.objects.get_or_create(name='Microsoft', address_line_1='Somewhere',
+                                                             city=self.city, state=self.state,
+                                                             pin_code='560010', landline_number='080-35353534',
+                                                             tin='1111111',
+                                                             tan='111111111', service_tax_number='11111111')
+        self.user, result = User.objects.get_or_create(email = "test@123.com", mobile_no="123123",
+                                                       password = "trial123", is_staff=True,
+                                                       is_superuser=False, company=self.company)
+        self.push_notification, result = PushNotification.objects.get_or_create(user=self.user,
+                                                                           gcm_id = "abc123",
+                                                                           imei_no="329478",
+                                                                           phone_no="123123",
+                                                                           mobile_make="Nokia",
+                                                                           mobile_model="abc123",
+                                                                           os_version = "os5",
+                                                                           app_version = 3.02)
+    def test_a_valid_push_notification(self):
+        self.assertEqual(self.push_notification.user, self.user)
+        self.assertEqual(self.push_notification.gcm_id,"abc123")
+        self.assertEqual(self.push_notification.imei_no,"329478")
+        self.assertEqual(self.push_notification.phone_no,"123123")
+        self.assertEqual(self.push_notification.mobile_make,"Nokia")
+        self.assertEqual(self.push_notification.mobile_model,"abc123")
+        self.assertEqual(self.push_notification.os_version,"os5")
+        self.assertEqual(self.push_notification.app_version,3.02)
+
+    def test_not_vaild_if_user_is_missing(self):
+        with self.assertRaises(IntegrityError):
+            another_push_notification = PushNotification.objects.get_or_create(gcm_id = "abc123",
+                                                                               imei_no="329478",
+                                                                               phone_no="123123",
+                                                                               mobile_make="Nokia",
+                                                                               mobile_model="abc123",
+                                                                               os_version = "os5",
+                                                                               app_version = 3.02)
