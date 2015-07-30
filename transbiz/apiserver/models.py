@@ -13,6 +13,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 
 
 class State(TimeStampedModel):
@@ -188,6 +189,7 @@ class Sale(TimeStampedModel):
     shipped_to = models.ManyToManyField(City)
     box_contents = models.CharField(max_length=200, blank="True")
     active = models.BooleanField(default=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta:
         verbose_name_plural = "Sales"
@@ -247,6 +249,26 @@ class ProductImage(TimeStampedModel):
         if count >= 3:
             return False
         return True
+
+
+class SaleResponse(TimeStampedModel):
+    product = models.ForeignKey(Sale)
+    questions = ArrayField(
+                    models.CharField(max_length=50,blank=True),
+                    )
+    cities = ArrayField(
+                models.CharField(max_length=200),
+                size = 20
+                )
+    qty_wanted = models.PositiveIntegerField(verbose_name="Quantity Wanted", validators=[MinValueValidator(1)])
+    comments = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        verbose_name_plural= "Sale Responses"
+        verbose_name= "Sale Response"
+
+    def __unicode__(self):
+        return unicode(self.product)
 
 
 class UserManager(BaseUserManager):

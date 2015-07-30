@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, Sale, PushNotification, ProductImage
+from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, Sale, PushNotification, ProductImage, SaleResponse
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -31,7 +31,7 @@ class MyUserCreationForm(UserCreationForm):
             return mobile
         raise forms.ValidationError("An user with the phone %s already exists" % mobile);
 
-
+from django.contrib.postgres.fields import ArrayField
 admin.site.register(State)
 admin.site.register(IndustryVertical)
 admin.site.register(Category)
@@ -43,6 +43,7 @@ admin.site.register(Brand)
 admin.site.register(Sale)
 admin.site.register(PushNotification)
 admin.site.register(ProductImage)
+admin.site.register(SaleResponse)
 
 @admin.register(User)
 class UserAdmin(AuthUserAdmin):

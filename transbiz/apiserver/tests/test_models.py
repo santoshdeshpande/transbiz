@@ -2,7 +2,7 @@ import unittest
 import datetime
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale, PushNotification, User, ProductImage
+from ..models import City, State, IndustryVertical, Category, SubscriptionPlan, Company, Subscription, Brand, Sale, PushNotification, User, ProductImage, SaleResponse
 from config.settings.common import DEFAULT_SALE_TIME
 
 class TestCityModel(unittest.TestCase):
@@ -178,13 +178,17 @@ class TestSaleModel(unittest.TestCase):
         self.brand, result = Brand.objects.get_or_create(name="iOS", category = self.category)
         self.start_date = datetime.datetime.now()
         self.end_date = datetime.datetime.now() + datetime.timedelta(days = 7)
+        self.user, result = User.objects.get_or_create(email = "XYZ@abc.com", mobile_no="111222",
+                                                       password = "trial123", is_staff=True,
+                                                       is_superuser=False, company=self.company)
         self.sale = Sale(company= self.company, category = self.category,
                          brand = self.brand, model = "proair", min_quantity = 2,
                          unit_of_measure = "pcs",price_in_inr = 24000,
                          new = True, refurbished = True, warranty = 24,
                          start_date=self.start_date, 
                          end_date = self.end_date,
-                         active = False )
+                         active = False, created_by = self.user )
+
 
 
     def test_a_valid_sale(self):
@@ -202,6 +206,7 @@ class TestSaleModel(unittest.TestCase):
         self.assertEqual(self.sale.end_date, self.end_date)
         self.assertFalse(self.sale.active)
         self.assertFalse(self.sale.is_active)
+        self.assertEqual(self.sale.created_by,self.user)
 
     def test_not_valid_if_min_quantity_is_negative(self):
         with self.assertRaises(IntegrityError):
@@ -216,7 +221,7 @@ class TestSaleModel(unittest.TestCase):
                                 new = True, refurbished = True, warranty = 24,
                                 start_date= self.start_date, 
                                 end_date = self.end_date,
-                                active = False )
+                                active = False,created_by = self.user )
             another_sale.save()
 
     def test_not_valid_if_category_is_missing(self):
@@ -227,7 +232,7 @@ class TestSaleModel(unittest.TestCase):
                                 new = True, refurbished = True, warranty = 24,
                                 start_date= self.start_date, 
                                 end_date = self.end_date,
-                                active = False )
+                                active = False,created_by = self.user )
             another_sale.save()
 
     def test_not_valid_if_model_is_missing(self):
@@ -239,7 +244,7 @@ class TestSaleModel(unittest.TestCase):
                                 new = True, refurbished = True, warranty = 24,
                                 start_date= self.start_date, 
                                 end_date = self.end_date,
-                                active = False )
+                                active = False,created_by = self.user )
             another_sale.save()
 
     def test_not_valid_if_brand_is_missing(self):
@@ -250,7 +255,7 @@ class TestSaleModel(unittest.TestCase):
                                 new = True, refurbished = True, warranty = 24,
                                 start_date= self.start_date, 
                                 end_date = self.end_date,
-                                active = False )
+                                active = False,created_by = self.user )
             another_sale.save()
 
     def test_not_valid_is_active(self):
@@ -261,7 +266,7 @@ class TestSaleModel(unittest.TestCase):
                             new = True, refurbished = True, warranty = 24,
                             start_date= self.start_date + datetime.timedelta(days = DEFAULT_SALE_TIME), 
                             end_date = self.end_date,
-                            active = False )
+                            active = False,created_by = self.user )
         self.assertFalse(another_sale.is_active)
 
 
@@ -321,13 +326,16 @@ class TestProductImage(unittest.TestCase):
         self.brand, result = Brand.objects.get_or_create(name="iOS", category = self.category)
         self.start_date = datetime.datetime.now()
         self.end_date = datetime.datetime.now() + datetime.timedelta(days = 7)
+        self.user, result = User.objects.get_or_create(email = "XYZ@abc.com", mobile_no="111222",
+                                                       password = "trial123", is_staff=True,
+                                                       is_superuser=False, company=self.company)
         self.sale, result = Sale.objects.get_or_create(company= self.company, category = self.category,
                                                        brand = self.brand, model = "proair", min_quantity = 2,
                                                        unit_of_measure = "pcs",price_in_inr = 24000,
                                                        new = True, refurbished = True, warranty = 24,
                                                        start_date=self.start_date, 
                                                        end_date = self.end_date,
-                                                       active = False )
+                                                       active = False, created_by = self.user )
         self.productimage1 = ProductImage.objects.create(product=self.sale, order=23)
         self.productimage2 = ProductImage.objects.create(product=self.sale, order=235)
         self.productimage3 = ProductImage.objects.create(product=self.sale, order=231)
