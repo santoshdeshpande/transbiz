@@ -1,9 +1,10 @@
 from rest_framework.decorators import list_route
-from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer
+from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, SaleSerializer
 from rest_framework import viewsets
-from .models import State, City, User, Company, PushNotification
+from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical
 from rest_framework.response import Response
 from django.conf import settings
+from django.utils import timezone
 
 
 class StateViewSet(viewsets.ModelViewSet):
@@ -56,3 +57,10 @@ class PushNotificationViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+class SaleViewSet(viewsets.ModelViewSet):
+    serializer_class = SaleSerializer
+    queryset = Sale.objects.all()
+
+    def get_queryset(self):
+        sales = Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=False).filter()

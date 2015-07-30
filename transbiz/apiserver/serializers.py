@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SubscriptionPlan, State, City, User, Company, PushNotification
+from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -34,3 +34,8 @@ class PushNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PushNotification
         fields = ('id', 'gcm_id', 'imei_no', 'phone_no', 'mobile_make', 'mobile_model', 'os_version', 'app_version')
+
+class SaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sale
+        #fields = ('id','company','category','brand','model','description','min_quantity','unit_of_measure','price_in_inr','new','refurbished','warranty','start_date')
