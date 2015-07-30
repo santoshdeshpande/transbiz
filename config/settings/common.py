@@ -286,3 +286,8 @@ TRANSBIZ_COMPANY_NAME = 'Optibiz'
 DEFAULT_SALE_TIME = 7
 
 DEFAULT_USER_CREATION_COUNT = 3
+
+SWAGGER_SETTINGS = {
+    'is_authenticated' : True,
+    
+}
