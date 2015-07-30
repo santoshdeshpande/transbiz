@@ -14,6 +14,7 @@ urlpatterns = [
 
     # User management
     url(r'^api/v1/', include("transbiz.apiserver.urls", namespace="api")),
+    url(r'^docs/', include('rest_framework_swagger.urls')),
     # url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here

@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'crispy_forms',  # Form layouts
     'rest_framework',
+    'rest_framework_swagger'
 )
 
 # Apps specific for this project go here.
