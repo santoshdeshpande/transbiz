@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from uuid import uuid4
 
 
 class State(TimeStampedModel):
@@ -226,10 +227,14 @@ class PushNotification(TimeStampedModel):
     def __unicode__(self):
         return unicode(self.user)
 
-    
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid4(), ext)
+    return filename
+
 class ProductImage(TimeStampedModel):
     product = models.ForeignKey(Sale, related_name="images")
-    image = models.ImageField(upload_to='prod_image', blank=True, null=True)
+    image = models.ImageField(upload_to=get_file_path, blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
