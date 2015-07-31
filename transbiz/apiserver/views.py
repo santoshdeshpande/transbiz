@@ -63,7 +63,7 @@ class SaleViewSet(viewsets.ModelViewSet):
     queryset = Sale.objects.all()
 
     def get_queryset(self):
-        sales = Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=False).filter()
+        return Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=False)
 
 class SaleResponseViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResponseSerializer
