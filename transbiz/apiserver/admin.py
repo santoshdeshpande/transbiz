@@ -40,9 +40,9 @@ admin.site.register(City)
 admin.site.register(Company)
 admin.site.register(Subscription)
 admin.site.register(Brand)
-admin.site.register(Sale)
+#admin.site.register(Sale)
 admin.site.register(PushNotification)
-admin.site.register(ProductImage)
+#admin.site.register(ProductImage)
 admin.site.register(SaleResponse)
 
 @admin.register(User)
@@ -69,6 +69,14 @@ class UserAdmin(AuthUserAdmin):
     )
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
 
+
+@admin.register(Sale)
+class SaleAdmin(admin.ModelAdmin):
+    inlines=[
+    ProductImageInline,
+    ]
 
 # admin.site.register(User, UserAdmin)

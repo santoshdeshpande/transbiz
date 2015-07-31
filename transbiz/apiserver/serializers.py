@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale
+from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -39,3 +39,7 @@ class SaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sale
         #fields = ('id','company','category','brand','model','description','min_quantity','unit_of_measure','price_in_inr','new','refurbished','warranty','start_date')
+
+class SaleResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleResponse

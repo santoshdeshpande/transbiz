@@ -258,7 +258,6 @@ class SaleResponse(TimeStampedModel):
                     )
     cities = ArrayField(
                 models.CharField(max_length=200),
-                size = 20
                 )
     qty_wanted = models.PositiveIntegerField(verbose_name="Quantity Wanted", validators=[MinValueValidator(1)])
     comments = models.CharField(max_length=200, blank=True)
