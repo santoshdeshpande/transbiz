@@ -212,7 +212,7 @@ class Sale(TimeStampedModel):
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    gcm_id = models.CharField(max_length = 30)
+    gcm_id = models.CharField(max_length = 400)
     imei_no = models.CharField(max_length= 16)
     phone_no = models.CharField(max_length = 10, blank = True)
     mobile_make = models.CharField(max_length = 50)
