@@ -45,7 +45,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class SaleSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
-
+    company = serializers.PrimaryKeyRelatedField(required=False)
+    
     class Meta:
         model = Sale
         fields = ('id',
