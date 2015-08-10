@@ -212,13 +212,13 @@ class Sale(TimeStampedModel):
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    gcm_id = models.CharField(max_length = 400)
-    imei_no = models.CharField(max_length= 16)
-    phone_no = models.CharField(max_length = 10, blank = True)
-    mobile_make = models.CharField(max_length = 50)
-    mobile_model = models.CharField(max_length = 50)
-    os_version = models.CharField(max_length = 50)
-    app_version = models.CharField(max_length= 10)
+    gcm_id = models.CharField(max_length=400)
+    imei_no = models.CharField(max_length=16)
+    phone_no = models.CharField(max_length=10, blank=True)
+    mobile_make = models.CharField(max_length=50)
+    mobile_model = models.CharField(max_length=50)
+    os_version = models.CharField(max_length=50)
+    app_version = models.CharField(max_length=10)
 
     class Meta:
         verbose_name_plural = "Push Notifications"
@@ -227,10 +227,12 @@ class PushNotification(TimeStampedModel):
     def __unicode__(self):
         return unicode(self.user)
 
+
 def get_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid4(), ext)
     return filename
+
 
 class ProductImage(TimeStampedModel):
     product = models.ForeignKey(Sale, related_name="images")
@@ -248,7 +250,6 @@ class ProductImage(TimeStampedModel):
         if not self.validate_number_of_images_per_sale():
             raise ValidationError("Limit on number of images for %s has been reached" % self.product)
 
-
     def validate_number_of_images_per_sale(self):
         count = ProductImage.objects.filter(product=self.product).count()
         if count >= 3:
@@ -259,17 +260,17 @@ class ProductImage(TimeStampedModel):
 class SaleResponse(TimeStampedModel):
     product = models.ForeignKey(Sale)
     questions = ArrayField(
-                    models.CharField(max_length=50,blank=True),
-                    )
+        models.CharField(max_length=50, blank=True),
+    )
     cities = ArrayField(
-                models.CharField(max_length=200),
-                )
+        models.CharField(max_length=200),
+    )
     qty_wanted = models.PositiveIntegerField(verbose_name="Quantity Wanted", validators=[MinValueValidator(1)])
     comments = models.CharField(max_length=200, blank=True)
 
     class Meta:
-        verbose_name_plural= "Sale Responses"
-        verbose_name= "Sale Response"
+        verbose_name_plural = "Sale Responses"
+        verbose_name = "Sale Response"
 
     def __unicode__(self):
         return unicode(self.product)

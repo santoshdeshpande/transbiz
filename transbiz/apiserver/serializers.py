@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, Category, IndustryVertical, Brand
+from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
+    Category, IndustryVertical, Brand
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -39,10 +40,12 @@ class PushNotificationSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('product','image','order')
+        fields = ('product', 'image', 'order', 'id')
+
 
 class SaleSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
+
     class Meta:
         model = Sale
         fields = ('id',
@@ -66,6 +69,20 @@ class SaleSerializer(serializers.ModelSerializer):
                   'images',
                   )
 
+    def create(self, validated_data):
+        images_data = validated_data.pop('images')
+        shipped_to = validated_data.pop('shipped_to')
+        product = Sale.objects.create(**validated_data)
+        for image_data in images_data:
+            ProductImage.objects.create(product=product, **image_data)
+        product.shipped_to = shipped_to
+        product.save()
+
+        return product
+
+
+
+
 class SaleResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleResponse
@@ -75,10 +92,12 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
 
+
 class IndustryVerticalSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndustryVertical
 
+
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Brand     
+        model = Brand
