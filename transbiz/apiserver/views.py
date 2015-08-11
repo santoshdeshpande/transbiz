@@ -7,6 +7,7 @@ from .models import State, City, User, Company, PushNotification, Sale, Industry
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
+from rest_framework.permissions import AllowAny
 
 
 class StateViewSet(viewsets.ModelViewSet):
@@ -19,9 +20,11 @@ class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
 
 
+# @permission_classes((AllowAny, ))
 class CompanyViewSet(viewsets.ModelViewSet):
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         user = self.request.user
