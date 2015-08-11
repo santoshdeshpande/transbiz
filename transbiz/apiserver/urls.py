@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from .views import StateViewSet, CityViewSet, UserViewSet, CompanyViewSet, PushNotificationViewSet, SaleViewSet, SaleResponseViewSet, CategoryViewSet, IndustryVerticalViewSet, BrandViewSet
+from .views import StateViewSet, CityViewSet, UserViewSet, CompanyViewSet, PushNotificationViewSet, SaleViewSet, SaleResponseViewSet, CategoryViewSet, IndustryVerticalViewSet, BrandViewSet, SignUpViewSet
 
 try:
     from django.conf.urls import *
@@ -18,9 +18,10 @@ router.register('saleresponse', SaleResponseViewSet)
 router.register('categories', CategoryViewSet)
 router.register('verticals', IndustryVerticalViewSet)
 router.register('brands', BrandViewSet)
+router.register('sign-up', SignUpViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
-
+    #url(r'^sign-up/',SignUpViewSet)
 ]

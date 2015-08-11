@@ -1,6 +1,6 @@
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
-    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer
+    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
     IndustryVertical, Brand
@@ -92,3 +92,6 @@ class IndustryVerticalViewSet(viewsets.ModelViewSet):
 class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     queryset = Brand.objects.all()
+
+class SignUpViewSet(viewsets.ViewSet):
+    serializer_class = SignUpSerializer
