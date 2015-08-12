@@ -7,17 +7,19 @@ from .models import State, City, User, Company, PushNotification, Sale, Industry
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 
 class StateViewSet(viewsets.ModelViewSet):
     serializer_class = StateSerializer
     queryset = State.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     queryset = City.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 # @permission_classes((AllowAny, ))
