@@ -87,11 +87,13 @@ class SaleResponseViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class IndustryVerticalViewSet(viewsets.ModelViewSet):
     serializer_class = IndustryVerticalSerializer
     queryset = IndustryVertical.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BrandViewSet(viewsets.ModelViewSet):
