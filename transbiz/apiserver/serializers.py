@@ -42,10 +42,19 @@ class ProductImageSerializer(serializers.ModelSerializer):
         model = ProductImage
         fields = ('product', 'image', 'order', 'id')
 
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
 
 class SaleSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
     company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    category = CategorySerializer(required=False) 
+    brand = BrandSerializer(required=False)
 
     class Meta:
         model = Sale
@@ -89,19 +98,9 @@ class SaleResponseSerializer(serializers.ModelSerializer):
         model = SaleResponse
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-
-
 class IndustryVerticalSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndustryVertical
-
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.EmailField(allow_blank=False)
