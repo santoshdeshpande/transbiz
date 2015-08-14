@@ -54,7 +54,7 @@ class IndustryVertical(TimeStampedModel):
 class Category(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(null=True, blank=True)
-    vertical = models.ForeignKey(IndustryVertical)
+    vertical = models.ForeignKey(IndustryVertical, related_name="categories")
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -175,7 +175,7 @@ class Sale(TimeStampedModel):
         ('pcks', 'Packs'),)
 
     company = models.ForeignKey(Company)
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, related_name='sales')
     brand = models.ForeignKey(Brand)
     model = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True)

@@ -1,9 +1,11 @@
 from rest_framework.decorators import list_route
-from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
-    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer
+from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, \
+    PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
+    CategorySaleSerializer, IndustryVerticalSerializer, IndustryVerticalCategorySerializer, \
+    BrandSerializer, SignUpSerializer
 from rest_framework import viewsets
-from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand
+from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, \
+    SaleResponse, Category, IndustryVertical, Brand
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -89,6 +91,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+
+class DashboardViewSet(viewsets.ModelViewSet):
+    serializer_class = IndustryVerticalCategorySerializer
+    queryset = IndustryVertical.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 class IndustryVerticalViewSet(viewsets.ModelViewSet):
     serializer_class = IndustryVerticalSerializer
