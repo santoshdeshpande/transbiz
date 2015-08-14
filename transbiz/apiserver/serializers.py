@@ -82,8 +82,6 @@ class SaleSerializer(serializers.ModelSerializer):
         return product
 
 
-
-
 class SaleResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleResponse
@@ -102,6 +100,7 @@ class IndustryVerticalSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
+
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.EmailField(allow_blank=False)

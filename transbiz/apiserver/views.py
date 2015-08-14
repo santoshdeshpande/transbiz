@@ -100,5 +100,15 @@ class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     queryset = Brand.objects.all()
 
+
 class SignUpViewSet(viewsets.ViewSet):
     serializer_class = SignUpSerializer
+
+
+class MyTradesViewSet(viewsets.ModelViewSet):
+    serializer_class = SaleSerializer
+    queryset = Sale.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user.id
+        return Sale.objects.filter(created_by=user).exclude(end_date__lt=timezone.now()).filter(active=True)
