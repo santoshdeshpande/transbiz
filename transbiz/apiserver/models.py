@@ -258,6 +258,7 @@ class ProductImage(TimeStampedModel):
 
 
 class SaleResponse(TimeStampedModel):
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL)
     product = models.ForeignKey(Sale)
     questions = ArrayField(
         models.CharField(max_length=50, blank=True),
