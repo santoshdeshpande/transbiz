@@ -1,9 +1,10 @@
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
-    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer
+    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
+    QuestionSerializer
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand
+    IndustryVertical, Brand, Question
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -111,3 +112,8 @@ class MyTradesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user.id
         return Sale.objects.filter(created_by=user).exclude(end_date__lt=timezone.now()).filter(active=True)
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()

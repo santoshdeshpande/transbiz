@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
-    Category, IndustryVertical, Brand
+    Category, IndustryVertical, Brand, Question
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -40,7 +40,13 @@ class PushNotificationSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('product', 'image', 'order', 'id')
+        fields = ('id', 'product')
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ('id', 'question')
 
 
 class SaleSerializer(serializers.ModelSerializer):
@@ -68,6 +74,7 @@ class SaleSerializer(serializers.ModelSerializer):
                   'active',
                   'created_by',
                   'images',
+                  'saleItem',
                   )
 
     def create(self, validated_data):

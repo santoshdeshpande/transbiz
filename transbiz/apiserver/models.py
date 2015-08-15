@@ -192,6 +192,12 @@ class Sale(TimeStampedModel):
     active = models.BooleanField(default=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
+    def _sale_item(self):
+        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+        # return self.category.name +" "+ self.brand.name +" "+ self.model
+
+    saleItem = property(_sale_item) 
+
     class Meta:
         verbose_name_plural = "Sales"
         verbose_name = "Sale"
@@ -209,6 +215,8 @@ class Sale(TimeStampedModel):
         date_now = date.today()
         return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
 
+    
+    
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -257,12 +265,21 @@ class ProductImage(TimeStampedModel):
         return True
 
 
+class Question(TimeStampedModel):
+    question = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Questions"
+        verbose_name = "Question"
+
+    def __unicode__(self):
+        return unicode(self.question)
+
+
 class SaleResponse(TimeStampedModel):
     requested_by = models.ForeignKey(settings.AUTH_USER_MODEL)
     product = models.ForeignKey(Sale)
-    questions = ArrayField(
-        models.CharField(max_length=200, blank=True),
-    )
+    questions = models.ManyToManyField(Question)
     cities = ArrayField(
         models.CharField(max_length=200),
     )
