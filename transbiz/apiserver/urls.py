@@ -19,7 +19,6 @@ router.register('categories', CategoryViewSet)
 router.register('dashboard', DashboardViewSet)
 router.register('verticals', IndustryVerticalViewSet)
 router.register('brands', BrandViewSet)
-#router.register('sign-up', SignUpViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

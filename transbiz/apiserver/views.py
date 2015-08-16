@@ -10,7 +10,17 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
 
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class StateViewSet(viewsets.ModelViewSet):
     serializer_class = StateSerializer
@@ -70,9 +80,14 @@ class PushNotificationViewSet(viewsets.ModelViewSet):
 class SaleViewSet(viewsets.ModelViewSet):
     serializer_class = SaleSerializer
     queryset = Sale.objects.all()
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=True)
+        sales_queryset = Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=True)
+        category_id = self.request.query_params.get('category_id', None)
+        if category_id is not None:
+            sales_queryset = sales_queryset.filter(category_id=category_id)
+        return sales_queryset
 
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)

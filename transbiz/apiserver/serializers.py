@@ -58,8 +58,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class SaleSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
     company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
-    brand = BrandSerializer(required=False)
-    category = CategorySerializer(required=False)
+    # brand = BrandSerializer(required=False)
+    # category = CategorySerializer(required=False)
 
     class Meta:
         model = Sale
