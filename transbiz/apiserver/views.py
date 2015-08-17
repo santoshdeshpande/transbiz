@@ -1,16 +1,16 @@
 from rest_framework.decorators import list_route
-from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, \
-    PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
-    CategorySaleSerializer, IndustryVerticalSerializer, IndustryVerticalCategorySerializer, \
-    BrandSerializer, SignUpSerializer
 from rest_framework import viewsets
-from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, \
-    SaleResponse, Category, IndustryVertical, Brand
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
+
+from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, \
+    PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
+    IndustryVerticalSerializer, IndustryVerticalCategorySerializer, BrandSerializer, SignUpSerializer
+from .models import State, City, User, Company, PushNotification, Sale, SaleResponse, Category, IndustryVertical, Brand
+
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
