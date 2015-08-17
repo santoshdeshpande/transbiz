@@ -17,10 +17,12 @@ class LargeResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 10000
 
+
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 1000
+
 
 class StateViewSet(viewsets.ModelViewSet):
     serializer_class = StateSerializer
@@ -85,8 +87,18 @@ class SaleViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         sales_queryset = Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=True)
         category_id = self.request.query_params.get('category_id', None)
+        is_new = self.request.query_params.get('new', None)
+        is_old = self.request.query_params.get('old', None)
+        sort = self.request.query_params.get('sort', None)
         if category_id is not None:
             sales_queryset = sales_queryset.filter(category_id=category_id)
+        if is_new is not None:
+            sales_queryset = sales_queryset.filter(new=(is_new == str('true')))
+        if is_old is not None:
+            sales_queryset = sales_queryset.filter(refurbished=(is_old == str('true')))
+        if sort is not None:
+            sales_queryset = sales_queryset.order_by(sort)
+
         return sales_queryset
 
     def perform_create(self, serializer):
@@ -112,6 +124,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
     queryset = IndustryVertical.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+
 class IndustryVerticalViewSet(viewsets.ModelViewSet):
     serializer_class = IndustryVerticalSerializer
     queryset = IndustryVertical.objects.all()
@@ -121,6 +134,7 @@ class IndustryVerticalViewSet(viewsets.ModelViewSet):
 class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     queryset = Brand.objects.all()
+
 
 class SignUpViewSet(viewsets.ViewSet):
     serializer_class = SignUpSerializer
