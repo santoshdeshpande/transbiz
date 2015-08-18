@@ -9,6 +9,24 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
+
+from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, \
+    PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
+    IndustryVerticalSerializer, IndustryVerticalCategorySerializer, BrandSerializer, SignUpSerializer
+from .models import State, City, User, Company, PushNotification, Sale, SaleResponse, Category, IndustryVertical, Brand
+
+
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 
 class StateViewSet(viewsets.ModelViewSet):
@@ -68,9 +86,24 @@ class PushNotificationViewSet(viewsets.ModelViewSet):
 class SaleViewSet(viewsets.ModelViewSet):
     serializer_class = SaleSerializer
     queryset = Sale.objects.all()
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=True)
+        sales_queryset = Sale.objects.exclude(end_date__lt=timezone.now()).filter(active=True)
+        category_id = self.request.query_params.get('category_id', None)
+        is_new = self.request.query_params.get('new', None)
+        is_old = self.request.query_params.get('old', None)
+        sort = self.request.query_params.get('sort', None)
+        if category_id is not None:
+            sales_queryset = sales_queryset.filter(category_id=category_id)
+        if is_new is not None:
+            sales_queryset = sales_queryset.filter(new=(is_new == str('true')))
+        if is_old is not None:
+            sales_queryset = sales_queryset.filter(refurbished=(is_old == str('true')))
+        if sort is not None:
+            sales_queryset = sales_queryset.order_by(sort)
+
+        return sales_queryset
 
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
@@ -87,6 +120,12 @@ class SaleResponseViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class DashboardViewSet(viewsets.ModelViewSet):
+    serializer_class = IndustryVerticalCategorySerializer
+    queryset = IndustryVertical.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 

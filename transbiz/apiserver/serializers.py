@@ -43,6 +43,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'product')
 
 
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+
+
+class IndustryVerticalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndustryVertical
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
@@ -94,26 +109,18 @@ class SaleResponseSerializer(serializers.ModelSerializer):
         model = SaleResponse
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
+class IndustryVerticalCategorySerializer(serializers.ModelSerializer):
+    categories = CategorySerializer(many=True, read_only=True)
 
-
-class IndustryVerticalSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndustryVertical
-
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
 
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.EmailField(allow_blank=False)
     password = serializers.CharField(
         style={'input_type': 'password'}
-        )
+    )
     first_name = serializers.CharField(max_length=70)
     last_name = serializers.CharField(max_length=70)
     mobile_no = serializers.CharField(max_length=13)
@@ -122,7 +129,7 @@ class SignUpSerializer(serializers.Serializer):
     address_line_1 = serializers.CharField(max_length=200)
     address_line_2 = serializers.CharField(max_length=200, allow_blank=True)
     city = serializers.StringRelatedField()
-    state =serializers.StringRelatedField()
+    state = serializers.StringRelatedField()
     pin_code = serializers.CharField(max_length=20)
     landline_number = serializers.CharField(max_length=20)
     tin = serializers.CharField(max_length=11)
@@ -133,9 +140,9 @@ class SignUpSerializer(serializers.Serializer):
     established_year = serializers.IntegerField()
     logo = serializers.ImageField(allow_empty_file=True)
 
-    fields = ('username','password','first_name','last_name','mobile_no','company_name','address_line_1',
-              'address_line_2','city','state','pin_code','landline_number','tin','tan',
-              'service_tax_number','ie_number','website','established_year','logo')
+    fields = ('username', 'password', 'first_name', 'last_name', 'mobile_no', 'company_name', 'address_line_1',
+              'address_line_2', 'city', 'state', 'pin_code', 'landline_number', 'tin', 'tan',
+              'service_tax_number', 'ie_number', 'website', 'established_year', 'logo')
 
     def create(self, validated_data):
         username = validated_data.pop('username')
@@ -159,11 +166,13 @@ class SignUpSerializer(serializers.Serializer):
         established_year = validated_data.pop('established_year')
         logo = validated_data.pop('logo')
 
-        company = Company.objects.create(name=company_name, address_line_1=address_line_1, 
-                  address_line_2=address_line_2, city=city, state=state, pin_code=pin_code,
-                  landline_number=landline_number, tin=tin, tan=tan, service_tax_number=service_tax_number,
-                  ie_number=ie_number, website=website, active=False, established_year=established_year,
-                  logo=logo, verified=False)
+        company = Company.objects.create(name=company_name, address_line_1=address_line_1,
+                                         address_line_2=address_line_2, city=city, state=state, pin_code=pin_code,
+                                         landline_number=landline_number, tin=tin, tan=tan,
+                                         service_tax_number=service_tax_number,
+                                         ie_number=ie_number, website=website, active=False,
+                                         established_year=established_year,
+                                         logo=logo, verified=False)
 
         user = User.objects.create(first_name=first_name, last_name=last_name, mobile_no=mobile_no,
                company=company, password=password)
