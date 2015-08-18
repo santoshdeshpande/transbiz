@@ -40,7 +40,7 @@ class PushNotificationSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('id', 'product')
+        fields = ('id', 'product','image','order')
 
 
 class BrandSerializer(serializers.ModelSerializer):

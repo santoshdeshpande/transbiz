@@ -1,10 +1,10 @@
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
     SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
-    QuestionSerializer
+    QuestionSerializer, ProductImageSerializer
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand, Question
+    IndustryVertical, Brand, Question, ProductImage
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -115,6 +115,10 @@ class SaleViewSet(viewsets.ModelViewSet):
 class SaleResponseViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResponseSerializer
     queryset = SaleResponse.objects.all()
+
+class ProductImageViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductImageSerializer
+    queryset = ProductImage.objects.all()
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
