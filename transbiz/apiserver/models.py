@@ -280,9 +280,7 @@ class SaleResponse(TimeStampedModel):
     requested_by = models.ForeignKey(settings.AUTH_USER_MODEL)
     product = models.ForeignKey(Sale)
     questions = models.ManyToManyField(Question)
-    cities = ArrayField(
-        models.CharField(max_length=200),
-    )
+    cities = models.ManyToManyField(City)
     qty_wanted = models.PositiveIntegerField(verbose_name="Quantity Wanted", validators=[MinValueValidator(1)])
     comments = models.CharField(max_length=200, blank=True)
 
