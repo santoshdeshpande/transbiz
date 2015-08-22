@@ -1,3 +1,4 @@
+import re
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
     SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
@@ -106,10 +107,25 @@ class SaleViewSet(viewsets.ModelViewSet):
         return sales_queryset
 
     def perform_create(self, serializer):
-        serializer.save(company=self.request.user.company)
+        images = self.get_images_dict()
+        serializer.save(company=self.request.user.company, images=images)
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user.company)
+
+    def get_images_dict(self):
+        files = self.request.FILES
+        images = []
+        for key in files:
+            search = re.search(r'images_(\d+)_', key)
+            if search:
+                image = {'image': files[key]}
+                file_index = search.groups()[0]
+                order_key = 'images_%s_order' % str(file_index)
+                if order_key in self.request.DATA:
+                    image['order'] = self.request.DATA[order_key]
+                images.append(image)
+        return images
 
 
 class SaleResponseViewSet(viewsets.ModelViewSet):
