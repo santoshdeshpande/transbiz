@@ -195,7 +195,7 @@ class Sale(TimeStampedModel):
     def _response_count(self):
         return SaleResponse.objects.all().filter(product=self.id).count()
 
-    number_of_response = property(_response_count)
+    number_of_responses = property(_response_count)
 
     def _sale_item(self):
         return '%s %s %s' %(self.category.name, self.brand.name, self.model)
@@ -219,9 +219,6 @@ class Sale(TimeStampedModel):
     def is_active(self):
         date_now = date.today()
         return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
-
-    
-    
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
