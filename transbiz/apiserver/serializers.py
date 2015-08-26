@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
-    Category, IndustryVertical, Brand, Question
+    Category, IndustryVertical, Brand, Question, BuyRequest
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -176,3 +176,21 @@ class SignUpSerializer(serializers.Serializer):
 
         user = User.objects.create(first_name=first_name, last_name=last_name, mobile_no=mobile_no,
                company=company, password=password)
+
+
+class BuyRequestSerializer(serializers.ModelSerializer):
+    company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    class Meta:
+        model = BuyRequest
+
+    def create(self, validated_data):
+        print validated_data
+        user = validated_data['created_by']
+        validated_data['company'] = user.company
+        shipped_to = validated_data.pop('shipped_to')
+        buy_request = BuyRequest.objects.create(**validated_data)
+        buy_request.created = user.company.id
+        buy_request.company_id = user.company.id
+        buy_request.shipped_to = shipped_to
+        buy_request.save()
+        return buy_request

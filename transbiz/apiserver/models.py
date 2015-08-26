@@ -376,3 +376,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self._belongs_to_optibiz():
             return True
         return self.company.is_active and self.company.has_valid_subscriptions
+
+
+class BuyRequest(TimeStampedModel):
+    uom = (
+        ('pcs', 'Pieces'),
+        ('pcks', 'Packs'),)
+
+    company = models.ForeignKey(Company)
+    category = models.ForeignKey(Category, related_name='buy_request')
+    brand = models.ForeignKey(Brand, null=True, blank=True)
+    model = models.CharField(max_length=50, blank=True)
+    description = models.CharField(max_length=200, blank=True)
+    min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
+    unit_of_measure = models.CharField(max_length=10, choices=uom)
+    price_in_inr = models.PositiveIntegerField(default=0)
+    new = models.BooleanField(default=True)
+    refurbished = models.BooleanField(default=True)
+    warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months", default=0)
+    delivery_date = models.DateTimeField(default=timezone.now)
+    shipped_to = models.ManyToManyField(City)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
