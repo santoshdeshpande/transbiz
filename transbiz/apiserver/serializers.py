@@ -90,6 +90,7 @@ class SaleSerializer(serializers.ModelSerializer):
                   'created_by',
                   'images',
                   'saleItem',
+                  'number_of_responses'
                   )
 
     def create(self, validated_data):

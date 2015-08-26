@@ -192,6 +192,11 @@ class Sale(TimeStampedModel):
     active = models.BooleanField(default=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
+    def _response_count(self):
+        return SaleResponse.objects.all().filter(product=self.id).count()
+
+    number_of_response = property(_response_count)
+
     def _sale_item(self):
         return '%s %s %s' %(self.category.name, self.brand.name, self.model)
         # return self.category.name +" "+ self.brand.name +" "+ self.model
