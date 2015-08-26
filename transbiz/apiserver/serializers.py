@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
-    Category, IndustryVertical, Brand, Question
+    Category, IndustryVertical, Brand, Question, WishList
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -115,6 +115,25 @@ class IndustryVerticalCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IndustryVertical
+
+
+class WishListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WishList
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        wishlist = WishList.objects.filter(user = user)
+        products = validated_data.pop('marked_products')
+
+        if not wishlist:
+            w = WishList.objects.create(user=user)
+            w.marked_products.add(products[0])
+            return w
+        else:
+            wishlist[0].marked_products.add(products[0])
+            return wishlist[0]
+            
 
 
 class SignUpSerializer(serializers.Serializer):

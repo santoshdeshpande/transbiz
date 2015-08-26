@@ -294,6 +294,18 @@ class SaleResponse(TimeStampedModel):
         return unicode(self.product)
 
 
+class WishList(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    marked_products = models.ManyToManyField(Sale)
+
+    class Meta:
+        verbose_name_plural = "WishList"
+        verbose_name = "WishList"
+
+    def __unicode__(self):
+        return unicode(self.user)
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 

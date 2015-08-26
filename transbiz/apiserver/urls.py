@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from .views import StateViewSet, CityViewSet, UserViewSet, CompanyViewSet, PushNotificationViewSet, \
 SaleViewSet, SaleResponseViewSet, CategoryViewSet, IndustryVerticalViewSet, BrandViewSet, QuestionViewSet, \
-MyTradesViewSet, DashboardViewSet, ProductImageViewSet
+MyTradesViewSet, DashboardViewSet, ProductImageViewSet, WishListViewSet
 
 try:
     from django.conf.urls import *
@@ -24,6 +24,7 @@ router.register('verticals', IndustryVerticalViewSet)
 router.register('brands', BrandViewSet)
 router.register('questions', QuestionViewSet)
 router.register('myTrades', MyTradesViewSet)
+router.register('wishlist', WishListViewSet)
 #router.register('sign-up', SignUpViewSet)
 
 urlpatterns = [

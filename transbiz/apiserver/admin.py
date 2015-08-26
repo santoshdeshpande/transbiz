@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, Sale, PushNotification, ProductImage, SaleResponse, Question
+from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, Sale, PushNotification, ProductImage, SaleResponse, Question, WishList
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -45,6 +45,7 @@ admin.site.register(PushNotification)
 #admin.site.register(ProductImage)
 admin.site.register(SaleResponse)
 admin.site.register(Question)
+admin.site.register(WishList)
 
 @admin.register(User)
 class UserAdmin(AuthUserAdmin):

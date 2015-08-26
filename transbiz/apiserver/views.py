@@ -2,10 +2,10 @@ import re
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
     SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
-    QuestionSerializer, ProductImageSerializer
+    QuestionSerializer, ProductImageSerializer, WishListSerializer
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand, Question, ProductImage
+    IndustryVertical, Brand, Question, ProductImage, WishList
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -176,3 +176,11 @@ class MyTradesViewSet(viewsets.ModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
+
+class WishListViewSet(viewsets.ModelViewSet):
+    serializer_class = WishListSerializer
+    queryset = WishList.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return WishList.objects.filter(user=user)
