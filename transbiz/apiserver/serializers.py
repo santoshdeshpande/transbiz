@@ -128,10 +128,12 @@ class WishListSerializer(serializers.ModelSerializer):
 
         if not wishlist:
             w = WishList.objects.create(user=user)
-            w.marked_products.add(products[0])
+            for product in products:
+                w.marked_products.add(product)
             return w
         else:
-            wishlist.marked_products.add(products[0])
+            for product in products:
+                wishlist.marked_products.add(product)
             return wishlist
             
 
