@@ -206,7 +206,6 @@ class BuyRequestSerializer(serializers.ModelSerializer):
         validated_data['company'] = user.company
         shipped_to = validated_data.pop('shipped_to')
         buy_request = BuyRequest.objects.create(**validated_data)
-        buy_request.created = user.company.id
         buy_request.company_id = user.company.id
         buy_request.shipped_to = shipped_to
         buy_request.save()
