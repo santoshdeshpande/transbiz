@@ -182,9 +182,26 @@ class BuyRequestSerializer(serializers.ModelSerializer):
     company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     class Meta:
         model = BuyRequest
+        fields = ('id',
+                  'company',
+                  'category',
+                  'brand',
+                  'model',
+                  'description',
+                  'min_quantity',
+                  'unit_of_measure',
+                  'price_in_inr',
+                  'new',
+                  'refurbished',
+                  'warranty',
+                  'delivery_date',
+                  'shipped_to',
+                  'created_by',
+                  )
 
     def create(self, validated_data):
         print validated_data
+        # print validated_data.pop('delivery_date')
         user = validated_data['created_by']
         validated_data['company'] = user.company
         shipped_to = validated_data.pop('shipped_to')
