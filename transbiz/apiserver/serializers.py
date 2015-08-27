@@ -197,6 +197,7 @@ class BuyRequestSerializer(serializers.ModelSerializer):
                   'delivery_date',
                   'shipped_to',
                   'created_by',
+                  'saleItem'
                   )
 
     def create(self, validated_data):

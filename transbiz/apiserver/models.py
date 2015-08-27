@@ -397,3 +397,8 @@ class BuyRequest(TimeStampedModel):
     delivery_date = models.DateTimeField(default=timezone.now)
     shipped_to = models.ManyToManyField(City)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    def _sale_item(self):
+        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+
+    saleItem = property(_sale_item)
