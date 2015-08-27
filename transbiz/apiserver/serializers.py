@@ -123,7 +123,7 @@ class WishListSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        wishlist = WishList.objects.filter(user = user)
+        wishlist = WishList.objects.filter(user = user).first()
         products = validated_data.pop('marked_products')
 
         if not wishlist:
@@ -131,8 +131,8 @@ class WishListSerializer(serializers.ModelSerializer):
             w.marked_products.add(products[0])
             return w
         else:
-            wishlist[0].marked_products.add(products[0])
-            return wishlist[0]
+            wishlist.marked_products.add(products[0])
+            return wishlist
             
 
 

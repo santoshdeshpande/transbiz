@@ -180,6 +180,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class WishListViewSet(viewsets.ModelViewSet):
     serializer_class = WishListSerializer
     queryset = WishList.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         user = self.request.user
