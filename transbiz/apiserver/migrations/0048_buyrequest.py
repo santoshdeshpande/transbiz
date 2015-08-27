@@ -6,7 +6,6 @@ import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
 import django.core.validators
-import transbiz.apiserver.models
 
 
 class Migration(migrations.Migration):
@@ -30,8 +29,8 @@ class Migration(migrations.Migration):
                 ('new', models.BooleanField(default=True)),
                 ('refurbished', models.BooleanField(default=True)),
                 ('warranty', models.PositiveIntegerField(default=0, verbose_name=b'Warranty in number of months')),
-                ('delivery_date', models.DateTimeField(default=transbiz.apiserver.models.get_end_date)),
-                ('brand', models.ForeignKey(to='apiserver.Brand', null=True)),
+                ('delivery_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('brand', models.ForeignKey(blank=True, to='apiserver.Brand', null=True)),
                 ('category', models.ForeignKey(related_name='buy_request', to='apiserver.Category')),
                 ('company', models.ForeignKey(to='apiserver.Company')),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
