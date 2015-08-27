@@ -118,6 +118,7 @@ class IndustryVerticalCategorySerializer(serializers.ModelSerializer):
 
 
 class WishListSerializer(serializers.ModelSerializer):
+    marked_products = SaleSerializer(many=True)
     class Meta:
         model = WishList
 
