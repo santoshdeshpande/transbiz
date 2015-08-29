@@ -168,12 +168,13 @@ class Subscription(TimeStampedModel):
 def get_end_date():
     return timezone.now() + timedelta(days=settings.DEFAULT_SALE_TIME)
 
+
 UOM = (
-        ('pcs', 'Pieces'),
-        ('pcks', 'Packs'),)
+    ('pcs', 'Pieces'),
+    ('pcks', 'Packs'),)
+
 
 class Sale(TimeStampedModel):
-
     company = models.ForeignKey(Company)
     category = models.ForeignKey(Category, related_name='sales')
     brand = models.ForeignKey(Brand)
@@ -193,10 +194,10 @@ class Sale(TimeStampedModel):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     def _sale_item(self):
-        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+        return '%s %s %s' % (self.category.name, self.brand.name, self.model)
         # return self.category.name +" "+ self.brand.name +" "+ self.model
 
-    saleItem = property(_sale_item) 
+    saleItem = property(_sale_item)
 
     class Meta:
         verbose_name_plural = "Sales"
@@ -215,8 +216,6 @@ class Sale(TimeStampedModel):
         date_now = date.today()
         return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
 
-    
-    
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -395,13 +394,13 @@ class BuyRequest(TimeStampedModel):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     def _sale_item(self):
-        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+        return '%s %s %s' % (self.category.name, self.brand.name, self.model)
 
     saleItem = property(_sale_item)
 
 
 class BuyResponse(TimeStampedModel):
-    buy_request = models.ForeignKey(BuyRequest,related_name='buy_request')
+    buy_request = models.ForeignKey(BuyRequest, related_name='buy_request')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
     comments = models.CharField(max_length=200, blank=True)
     company = models.ForeignKey(Company)
@@ -420,6 +419,6 @@ class BuyResponse(TimeStampedModel):
     box_contents = models.CharField(max_length=200, blank="True")
 
     def _sale_item(self):
-        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+        return '%s %s %s' % (self.category.name, self.brand.name, self.model)
 
     saleItem = property(_sale_item)
