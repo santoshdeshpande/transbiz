@@ -1,15 +1,14 @@
 import re
+
 from rest_framework.decorators import list_route
-from .serializers import *
 from rest_framework import viewsets
-from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand, Question, ProductImage, BuyRequest
 from rest_framework.response import Response
-from django.conf import settings
-from django.utils import timezone
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+
 from rest_framework.pagination import PageNumberPagination
 
+from .serializers import *
+from .models import Question, ProductImage, BuyRequest
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, \
     PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
     IndustryVerticalSerializer, IndustryVerticalCategorySerializer, BrandSerializer, SignUpSerializer
@@ -182,3 +181,10 @@ class BuyRequestViewSet(viewsets.ModelViewSet):
 class BuyResponseViewSet(viewsets.ModelViewSet):
     serializer_class = BuyResponseSerializer
     queryset = BuyResponse.objects.all()
+
+    def get_queryset(self):
+        buy_request = self.request.query_params.get('buy_request')
+        queryset = BuyResponse.objects.all()
+        if buy_request:
+            queryset = queryset.filter(buy_request=buy_request)
+        return queryset

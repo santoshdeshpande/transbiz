@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import *
 
 
@@ -39,7 +40,7 @@ class PushNotificationSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('id', 'product','image','order')
+        fields = ('id', 'product', 'image', 'order')
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -174,11 +175,13 @@ class SignUpSerializer(serializers.Serializer):
                                          logo=logo, verified=False)
 
         user = User.objects.create(first_name=first_name, last_name=last_name, mobile_no=mobile_no,
-               company=company, password=password)
+                                   company=company, password=password)
 
 
 class BuyRequestSerializer(serializers.ModelSerializer):
     company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False)
+
     class Meta:
         model = BuyRequest
         fields = ('id',
@@ -194,6 +197,7 @@ class BuyRequestSerializer(serializers.ModelSerializer):
                   'refurbished',
                   'warranty',
                   'delivery_date',
+                  'shipped_to_full',
                   'shipped_to',
                   'created_by',
                   'saleItem'
@@ -213,7 +217,10 @@ class BuyRequestSerializer(serializers.ModelSerializer):
 
 
 class BuyResponseSerializer(serializers.ModelSerializer):
-    company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    company = CompanySerializer(read_only=True)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False)
+    # shipped_to_id = serializers.PrimaryKeyRelatedField(required=False, many=True, source='shipped_to', read_only=True)
+
     class Meta:
         model = BuyResponse
         fields = ('id',
@@ -233,9 +240,14 @@ class BuyResponseSerializer(serializers.ModelSerializer):
                   'warranty',
                   'delivery_date',
                   'shipped_to',
+                  'shipped_to_full',
                   'saleItem',
                   'box_contents'
                   )
+
+    def validate(self, data):
+        print data
+        return data
 
     def create(self, validated_data):
         print validated_data
