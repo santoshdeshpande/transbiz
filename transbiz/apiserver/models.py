@@ -168,11 +168,11 @@ class Subscription(TimeStampedModel):
 def get_end_date():
     return timezone.now() + timedelta(days=settings.DEFAULT_SALE_TIME)
 
-
-class Sale(TimeStampedModel):
-    uom = (
+UOM = (
         ('pcs', 'Pieces'),
         ('pcks', 'Packs'),)
+
+class Sale(TimeStampedModel):
 
     company = models.ForeignKey(Company)
     category = models.ForeignKey(Category, related_name='sales')
@@ -180,7 +180,7 @@ class Sale(TimeStampedModel):
     model = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True)
     min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
-    unit_of_measure = models.CharField(max_length=10, choices=uom)
+    unit_of_measure = models.CharField(max_length=10, choices=UOM)
     price_in_inr = models.PositiveIntegerField(default=0)
     new = models.BooleanField(default=True)
     refurbished = models.BooleanField(default=True)
@@ -379,17 +379,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class BuyRequest(TimeStampedModel):
-    uom = (
-        ('pcs', 'Pieces'),
-        ('pcks', 'Packs'),)
-
     company = models.ForeignKey(Company)
     category = models.ForeignKey(Category, related_name='buy_request')
     brand = models.ForeignKey(Brand, null=True, blank=True)
     model = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=200, blank=True)
     min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
-    unit_of_measure = models.CharField(max_length=10, choices=uom)
+    unit_of_measure = models.CharField(max_length=10, choices=UOM)
     price_in_inr = models.PositiveIntegerField(default=0)
     new = models.BooleanField(default=True)
     refurbished = models.BooleanField(default=True)
@@ -397,6 +393,31 @@ class BuyRequest(TimeStampedModel):
     delivery_date = models.DateTimeField(default=timezone.now)
     shipped_to = models.ManyToManyField(City)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    def _sale_item(self):
+        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+
+    saleItem = property(_sale_item)
+
+
+class BuyResponse(TimeStampedModel):
+    buy_request = models.ForeignKey(BuyRequest,related_name='buy_request')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
+    comments = models.CharField(max_length=200, blank=True)
+    company = models.ForeignKey(Company)
+    category = models.ForeignKey(Category, related_name='buy_response')
+    brand = models.ForeignKey(Brand, null=True, blank=True)
+    model = models.CharField(max_length=50, blank=True)
+    description = models.CharField(max_length=200, blank=True)
+    min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
+    unit_of_measure = models.CharField(max_length=10, choices=UOM)
+    price_in_inr = models.PositiveIntegerField(default=0)
+    new = models.BooleanField(default=True)
+    refurbished = models.BooleanField(default=True)
+    warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months", default=0)
+    delivery_date = models.DateTimeField(default=timezone.now)
+    shipped_to = models.ManyToManyField(City)
+    box_contents = models.CharField(max_length=200, blank="True")
 
     def _sale_item(self):
         return '%s %s %s' %(self.category.name, self.brand.name, self.model)

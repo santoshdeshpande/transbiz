@@ -1,8 +1,6 @@
 import re
 from rest_framework.decorators import list_route
-from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
-    SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
-    QuestionSerializer, ProductImageSerializer, BuyRequestSerializer
+from .serializers import *
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
     IndustryVertical, Brand, Question, ProductImage, BuyRequest
@@ -180,3 +178,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class BuyRequestViewSet(viewsets.ModelViewSet):
     serializer_class = BuyRequestSerializer
     queryset = BuyRequest.objects.all()
+
+class BuyResponseViewSet(viewsets.ModelViewSet):
+    serializer_class = BuyResponseSerializer
+    queryset = BuyResponse.objects.all()
