@@ -198,10 +198,10 @@ class Sale(TimeStampedModel):
     number_of_responses = property(_response_count)
 
     def _sale_item(self):
-        return '%s %s %s' %(self.category.name, self.brand.name, self.model)
+        return '%s %s %s' % (self.category.name, self.brand.name, self.model)
         # return self.category.name +" "+ self.brand.name +" "+ self.model
 
-    saleItem = property(_sale_item) 
+    saleItem = property(_sale_item)
 
     class Meta:
         verbose_name_plural = "Sales"
@@ -219,6 +219,7 @@ class Sale(TimeStampedModel):
     def is_active(self):
         date_now = date.today()
         return self.active and (date_now >= self.start_date.date()) and (date_now <= self.end_date.date())
+
 
 class PushNotification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -296,7 +297,7 @@ class SaleResponse(TimeStampedModel):
 
 class WishList(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    marked_products = models.ManyToManyField(Sale)
+    marked_products = models.ManyToManyField(Sale, related_name='sale_wishlist')
 
     class Meta:
         verbose_name_plural = "WishList"

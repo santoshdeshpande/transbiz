@@ -118,13 +118,13 @@ class IndustryVerticalCategorySerializer(serializers.ModelSerializer):
 
 
 class WishListSerializer(serializers.ModelSerializer):
-    marked_products = SaleSerializer(many=True)
+
     class Meta:
         model = WishList
 
     def create(self, validated_data):
         user = validated_data.pop('user')
-        wishlist = WishList.objects.filter(user = user).first()
+        wishlist = WishList.objects.filter(user=user).first()
         products = validated_data.pop('marked_products')
 
         if not wishlist:
