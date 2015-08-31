@@ -218,13 +218,14 @@ class BuyRequestSerializer(serializers.ModelSerializer):
 
 class BuyResponseSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
-    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False, read_only=True)
     # shipped_to_id = serializers.PrimaryKeyRelatedField(required=False, many=True, source='shipped_to', read_only=True)
 
     class Meta:
         model = BuyResponse
         fields = ('id',
                   'buy_request',
+                  'is_deal',
                   'created_by',
                   'comments',
                   'company',

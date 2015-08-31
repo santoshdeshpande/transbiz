@@ -1,19 +1,16 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
-from django.db import models, IntegrityError
-
 from django.core.exceptions import ValidationError
 from django.db import models
-from datetime import date, timedelta
+
 # Create your models here.
 from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
 from uuid import uuid4
 
 
@@ -387,6 +384,7 @@ class BuyRequest(BaseSale):
     brand = models.ForeignKey(Brand, blank=True, null=True)
     category = models.ForeignKey(Category, related_name='buy_requests')
     delivery_date = models.DateTimeField(default=timezone.now)
+    is_closed = models.BooleanField(default=False)
 
 
 class BuyResponse(BaseSale):
@@ -396,3 +394,4 @@ class BuyResponse(BaseSale):
     comments = models.CharField(max_length=200, blank=True)
     delivery_date = models.DateTimeField(default=timezone.now)
     box_contents = models.CharField(max_length=200, blank="True")
+    is_deal = models.BooleanField(default=False)
