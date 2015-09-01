@@ -2,10 +2,10 @@ import re
 from rest_framework.decorators import list_route
 from .serializers import StateSerializer, CitySerializer, UserSerializer, CompanySerializer, PushNotificationSerializer, \
     SaleSerializer, SaleResponseSerializer, CategorySerializer, IndustryVerticalSerializer, BrandSerializer, SignUpSerializer, \
-    QuestionSerializer, ProductImageSerializer, WishListSerializer
+    QuestionSerializer, ProductImageSerializer, WishListSerializer, RemoveItemSerializer
 from rest_framework import viewsets
 from .models import State, City, User, Company, PushNotification, Sale, IndustryVertical, SaleResponse, Category, \
-    IndustryVertical, Brand, Question, ProductImage, WishList
+    IndustryVertical, Brand, Question, ProductImage, WishList, RemoveItem
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -16,6 +16,7 @@ from .serializers import StateSerializer, CitySerializer, UserSerializer, Compan
     PushNotificationSerializer, SaleSerializer, SaleResponseSerializer, CategorySerializer, \
     IndustryVerticalSerializer, IndustryVerticalCategorySerializer, BrandSerializer, SignUpSerializer
 from .models import State, City, User, Company, PushNotification, Sale, SaleResponse, Category, IndustryVertical, Brand
+
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
@@ -108,7 +109,7 @@ class SaleViewSet(viewsets.ModelViewSet):
             w = WishList.objects.all()
             sales_queryset = sales_queryset.filter(sale_wishlist=w)
         if ad is not None:
-            sales_queryset.count()>2
+            sales_queryset.count() > 2
             sales_queryset = sales_queryset[:3]
         return sales_queryset
 
@@ -137,6 +138,7 @@ class SaleViewSet(viewsets.ModelViewSet):
 class SaleResponseViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResponseSerializer
     queryset = SaleResponse.objects.all()
+
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
@@ -183,6 +185,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
 
+
 class WishListViewSet(viewsets.ModelViewSet):
     serializer_class = WishListSerializer
     queryset = WishList.objects.all()
@@ -191,3 +194,13 @@ class WishListViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return WishList.objects.filter(user=user)
+
+
+class RemoveItemViewSet(viewsets.ModelViewSet):
+    serializer_class = RemoveItemSerializer
+    queryset = RemoveItem.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.user
+        return RemoveItem.objects.filter(user=user)

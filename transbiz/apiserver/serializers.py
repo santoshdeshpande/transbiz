@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
-    Category, IndustryVertical, Brand, Question, WishList
+    Category, IndustryVertical, Brand, Question, WishList, RemoveItem
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -136,7 +136,27 @@ class WishListSerializer(serializers.ModelSerializer):
             for product in products:
                 wishlist.marked_products.add(product)
             return wishlist
-            
+
+
+class RemoveItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RemoveItem
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        remove_item = RemoveItem.objects.filter(user=user).first()
+        products = validated_data.pop('marked_products')
+
+        if not remove_item:
+            r = RemoveItem.objects.create(user=user)
+            for product in products:
+                r.marked_products.add(product)
+            return r
+        else:
+            for product in products:
+                remove_item.marked_products.add(product)
+            return remove_item
 
 
 class SignUpSerializer(serializers.Serializer):

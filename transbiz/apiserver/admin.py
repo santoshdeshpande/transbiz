@@ -1,9 +1,11 @@
 from django.contrib import admin
-from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, Sale, PushNotification, ProductImage, SaleResponse, Question, WishList
+from .models import State, IndustryVertical, Category, SubscriptionPlan, City, Subscription, Company, User, Brand, \
+    Sale, PushNotification, ProductImage, SaleResponse, Question, WishList, RemoveItem
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django import forms
+
 
 class MyUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
@@ -46,6 +48,8 @@ admin.site.register(PushNotification)
 admin.site.register(SaleResponse)
 admin.site.register(Question)
 admin.site.register(WishList)
+admin.site.register(RemoveItem)
+
 
 @admin.register(User)
 class UserAdmin(AuthUserAdmin):

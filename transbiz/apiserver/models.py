@@ -307,6 +307,18 @@ class WishList(TimeStampedModel):
         return unicode(self.user)
 
 
+class RemoveItem(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    marked_products = models.ManyToManyField(Sale, related_name='sale_remove')
+
+    class Meta:
+        verbose_name_plural = "Removed Items"
+        verbose_name = "Removed Item"
+
+    def __unicode__(self):
+        return unicode(self.user)
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
