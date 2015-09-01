@@ -96,6 +96,7 @@ class SaleViewSet(viewsets.ModelViewSet):
         is_old = self.request.query_params.get('old', None)
         sort = self.request.query_params.get('sort', None)
         wish_list = self.request.query_params.get('wishlist', None)
+        remove = self.request.query_params.get('remove', None)
         ad = self.request.query_params.get('ad', None)
         if category_id is not None:
             sales_queryset = sales_queryset.filter(category_id=category_id)
@@ -106,11 +107,14 @@ class SaleViewSet(viewsets.ModelViewSet):
         if sort is not None:
             sales_queryset = sales_queryset.order_by(sort)
         if wish_list is not None:
-            w = WishList.objects.all()
+            w = WishList.objects.filter(user=wish_list)
             sales_queryset = sales_queryset.filter(sale_wishlist=w)
         if ad is not None:
             sales_queryset.count() > 2
             sales_queryset = sales_queryset[:3]
+        if remove is not None:
+            r = RemoveItem.objects.filter(user=remove)
+            sales_queryset = sales_queryset.exclude(sale_remove=r)
         return sales_queryset
 
     def perform_create(self, serializer):
