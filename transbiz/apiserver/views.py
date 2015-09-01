@@ -17,7 +17,6 @@ from .serializers import StateSerializer, CitySerializer, UserSerializer, Compan
     IndustryVerticalSerializer, IndustryVerticalCategorySerializer, BrandSerializer, SignUpSerializer
 from .models import State, City, User, Company, PushNotification, Sale, SaleResponse, Category, IndustryVertical, Brand
 
-
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
     page_size_query_param = 'page_size'
@@ -96,6 +95,7 @@ class SaleViewSet(viewsets.ModelViewSet):
         is_old = self.request.query_params.get('old', None)
         sort = self.request.query_params.get('sort', None)
         wish_list = self.request.query_params.get('wishlist', None)
+        ad = self.request.query_params.get('ad', None)
         if category_id is not None:
             sales_queryset = sales_queryset.filter(category_id=category_id)
         if is_new is not None:
@@ -107,6 +107,9 @@ class SaleViewSet(viewsets.ModelViewSet):
         if wish_list is not None:
             w = WishList.objects.all()
             sales_queryset = sales_queryset.filter(sale_wishlist=w)
+        if ad is not None:
+            sales_queryset.count()>2
+            sales_queryset = sales_queryset[:3]
         return sales_queryset
 
     def perform_create(self, serializer):
