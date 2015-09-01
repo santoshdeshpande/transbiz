@@ -1,4 +1,5 @@
 from rest_framework.routers import DefaultRouter
+
 from .views import *
 
 try:
@@ -24,10 +25,10 @@ router.register('questions', QuestionViewSet)
 router.register('myTrades', MyTradesViewSet)
 router.register('buyRequest', BuyRequestViewSet)
 router.register('buyResponse', BuyResponseViewSet)
-#router.register('sign-up', SignUpViewSet)
+# router.register('sign-up', UserRegistration)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
-    #url(r'^sign-up/',SignUpViewSet)
+    url(r'^sign-up/', UserRegistration.as_view(), name="SignUp")
 ]
