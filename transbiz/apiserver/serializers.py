@@ -25,6 +25,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'email', 'mobile_no', 'first_name', 'last_name', 'company', 'date_joined')
 
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:

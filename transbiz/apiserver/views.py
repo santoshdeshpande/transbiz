@@ -4,8 +4,9 @@ from rest_framework.decorators import list_route
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
-
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 
 from .serializers import *
 from .models import Question, ProductImage, BuyRequest
@@ -129,6 +130,7 @@ class SaleResponseViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResponseSerializer
     queryset = SaleResponse.objects.all()
 
+
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
     queryset = ProductImage.objects.all()
@@ -174,9 +176,11 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
 
+
 class BuyRequestViewSet(viewsets.ModelViewSet):
     serializer_class = BuyRequestSerializer
     queryset = BuyRequest.objects.all()
+
 
 class BuyResponseViewSet(viewsets.ModelViewSet):
     serializer_class = BuyResponseSerializer
@@ -188,3 +192,24 @@ class BuyResponseViewSet(viewsets.ModelViewSet):
         if buy_request:
             queryset = queryset.filter(buy_request=buy_request)
         return queryset
+
+
+class UserRegistration(APIView):
+    def post(self, request, format=None):
+        user_data = request.data["user"]
+        company_data = request.data["company"]
+        connection_data = request.data["connections"]
+
+        company_serializer = CompanySerializer(data=company_data)
+        is_valid_company = company_serializer.is_valid()
+        if not is_valid_company:
+            return Response(company_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        company = company_serializer.save()
+
+        user_data["company_id"] = company.id
+        user_serializer = UserSerializer(data=user_data)
+        is_valid_user = user_serializer.is_valid()
+        if not is_valid_user:
+            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_serializer.create(user_data)
+        return Response(status=status.HTTP_201_CREATED)
