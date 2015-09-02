@@ -180,11 +180,12 @@ class SignUpSerializer(serializers.Serializer):
 
 class BuyRequestSerializer(serializers.ModelSerializer):
     company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
-    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', read_only=True, required=False)
 
     class Meta:
         model = BuyRequest
         fields = ('id',
+                  'is_closed',
                   'company',
                   'category',
                   'brand',
