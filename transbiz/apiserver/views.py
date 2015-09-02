@@ -143,6 +143,13 @@ class SaleResponseViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResponseSerializer
     queryset = SaleResponse.objects.all()
 
+    def get_queryset(self):
+        response_queryset = SaleResponse.objects.all()
+        product_id = self.request.query_params.get('product', None)
+        if product_id is not None:
+            response_queryset= SaleResponse.objects.filter(product__id=product_id)
+        return response_queryset
+
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
