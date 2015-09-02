@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 
 from rest_framework.decorators import list_route
 from rest_framework import viewsets
@@ -195,21 +196,32 @@ class BuyResponseViewSet(viewsets.ModelViewSet):
 
 
 class UserRegistration(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, format=None):
+        print request.data
         user_data = request.data["user"]
         company_data = request.data["company"]
         connection_data = request.data["connections"]
-
+        print connection_data
         company_serializer = CompanySerializer(data=company_data)
         is_valid_company = company_serializer.is_valid()
         if not is_valid_company:
             return Response(company_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         company = company_serializer.save()
 
+        vertical = connection_data["vertical"][0]
+        start_date = datetime.now().date()
+        end_date = start_date + timedelta(days=30)
+        subscription = Subscription(company=company, plan_id=1, vertical_id=vertical, start_date=start_date,
+                     end_date=end_date)
+        subscription.save()
+        print "Subscription Id: %d" % subscription.id
         user_data["company_id"] = company.id
         user_serializer = UserSerializer(data=user_data)
         is_valid_user = user_serializer.is_valid()
         if not is_valid_user:
             return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        user_serializer.create(user_data)
+        user = user_serializer.create(user_data)
+        v = send_mail("New company signed up", "Hi a new company has been created", None, "rajeshkenator@gmail.com")
+        print v
         return Response(status=status.HTTP_201_CREATED)
