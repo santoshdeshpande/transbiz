@@ -51,6 +51,8 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_anonymous():
+            return Company.objects.none()
         if user.company == settings.TRANSBIZ_COMPANY_NAME:
             return self.queryset
         return Company.objects.filter(pk=user.company.id)
@@ -263,6 +265,6 @@ class UserRegistration(APIView):
         if not is_valid_user:
             return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         user = user_serializer.create(user_data)
-        v = send_mail("New company signed up", "Hi a new company has been created", None, "rajeshkenator@gmail.com")
-        print v
+        # v = send_mail("New company signed up", "Hi a new company has been created", None, "rajeshkenator@gmail.com")
+        # print v
         return Response(status=status.HTTP_201_CREATED)
