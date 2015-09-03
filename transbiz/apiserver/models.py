@@ -209,8 +209,9 @@ class Sale(TimeStampedModel):
 
     def clean(self):
         super(Sale, self).clean()
-        if self.start_date < timezone.now():
-            raise ValidationError('Start date cannot be in the past')
+        if self.pk is None:
+            if self.start_date < timezone.now():
+                raise ValidationError('Start date cannot be in the past')
 
     def __unicode__(self):
         return "%s/%s/%s" % (self.brand, self.category, self.model)
