@@ -1,19 +1,16 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
-from django.db import models, IntegrityError
-
 from django.core.exceptions import ValidationError
 from django.db import models
-from datetime import date, timedelta
+
 # Create your models here.
 from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
 from uuid import uuid4
 
 
@@ -169,39 +166,46 @@ def get_end_date():
     return timezone.now() + timedelta(days=settings.DEFAULT_SALE_TIME)
 
 
-class Sale(TimeStampedModel):
-    uom = (
-        ('pcs', 'Pieces'),
-        ('pcks', 'Packs'),)
+UOM = (
+    ('pcs', 'Pieces'),
+    ('pcks', 'Packs'),)
 
+
+class BaseSale(TimeStampedModel):
     company = models.ForeignKey(Company)
-    category = models.ForeignKey(Category, related_name='sales')
-    brand = models.ForeignKey(Brand)
     model = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True)
     min_quantity = models.PositiveIntegerField(verbose_name="Minimum quantity", validators=[MinValueValidator(1)])
-    unit_of_measure = models.CharField(max_length=10, choices=uom)
+    unit_of_measure = models.CharField(max_length=10, choices=UOM)
     price_in_inr = models.PositiveIntegerField(default=0)
     new = models.BooleanField(default=True)
     refurbished = models.BooleanField(default=True)
     warranty = models.PositiveIntegerField(verbose_name="Warranty in number of months", default=0)
-    start_date = models.DateTimeField(default=timezone.now)
-    end_date = models.DateTimeField(default=get_end_date)
     shipped_to = models.ManyToManyField(City)
-    box_contents = models.CharField(max_length=200, blank="True")
-    active = models.BooleanField(default=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
 
-    def _response_count(self):
-        return SaleResponse.objects.all().filter(product=self.id).count()
-
-    number_of_responses = property(_response_count)
+    class Meta:
+        abstract = True
 
     def _sale_item(self):
         return '%s %s %s' % (self.category.name, self.brand.name, self.model)
         # return self.category.name +" "+ self.brand.name +" "+ self.model
 
     saleItem = property(_sale_item)
+
+
+class Sale(BaseSale):
+    brand = models.ForeignKey(Brand)
+    category = models.ForeignKey(Category, related_name='sales')
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField(default=get_end_date)
+    box_contents = models.CharField(max_length=200, blank="True")
+    active = models.BooleanField(default=False)
+    
+    def _response_count(self):
+        return SaleResponse.objects.all().filter(product=self.id).count()
+
+    number_of_responses = property(_response_count)
 
     class Meta:
         verbose_name_plural = "Sales"
@@ -404,3 +408,20 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self._belongs_to_optibiz():
             return True
         return self.company.is_active and self.company.has_valid_subscriptions
+
+
+class BuyRequest(BaseSale):
+    brand = models.ForeignKey(Brand, blank=True, null=True)
+    category = models.ForeignKey(Category, related_name='buy_requests')
+    delivery_date = models.DateTimeField(default=timezone.now)
+    is_closed = models.BooleanField(default=False)
+
+
+class BuyResponse(BaseSale):
+    brand = models.ForeignKey(Brand)
+    category = models.ForeignKey(Category, related_name='buy_response')
+    buy_request = models.ForeignKey(BuyRequest, related_name='buy_request')
+    comments = models.CharField(max_length=200, blank=True)
+    delivery_date = models.DateTimeField(default=timezone.now)
+    box_contents = models.CharField(max_length=200, blank="True")
+    is_deal = models.BooleanField(default=False)

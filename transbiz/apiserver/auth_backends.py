@@ -9,7 +9,9 @@ class EmailAuthBackend(ModelBackend):
         try:
             user = userModel._default_manager.get_by_natural_key(username)
             if user.is_valid_login() and user.check_password(password):
+                print "User ok: %s" % user
                 return user
+            print "Login Ok: %d" % user.is_valid_login()
         except userModel.DoesNotExist:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).

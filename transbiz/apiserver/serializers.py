@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import SubscriptionPlan, State, City, User, Company, PushNotification, Sale, SaleResponse, ProductImage, \
-    Category, IndustryVertical, Brand, Question, WishList, RemoveItem
+from .models import *
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -25,6 +24,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'email', 'mobile_no', 'first_name', 'last_name', 'company', 'date_joined')
 
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,7 +42,7 @@ class PushNotificationSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ('id', 'product','image','order')
+        fields = ('id', 'product', 'image', 'order')
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -218,4 +220,90 @@ class SignUpSerializer(serializers.Serializer):
                                          logo=logo, verified=False)
 
         user = User.objects.create(first_name=first_name, last_name=last_name, mobile_no=mobile_no,
-               company=company, password=password)
+                                   company=company, password=password)
+
+
+class BuyRequestSerializer(serializers.ModelSerializer):
+    company = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', read_only=True, required=False)
+
+    class Meta:
+        model = BuyRequest
+        fields = ('id',
+                  'is_closed',
+                  'company',
+                  'category',
+                  'brand',
+                  'model',
+                  'description',
+                  'min_quantity',
+                  'unit_of_measure',
+                  'price_in_inr',
+                  'new',
+                  'refurbished',
+                  'warranty',
+                  'delivery_date',
+                  'shipped_to_full',
+                  'shipped_to',
+                  'created_by',
+                  'saleItem'
+                  )
+
+    def create(self, validated_data):
+        print validated_data
+        # print validated_data.pop('delivery_date')
+        user = validated_data['created_by']
+        validated_data['company'] = user.company
+        shipped_to = validated_data.pop('shipped_to')
+        buy_request = BuyRequest.objects.create(**validated_data)
+        buy_request.company_id = user.company.id
+        buy_request.shipped_to = shipped_to
+        buy_request.save()
+        return buy_request
+
+
+class BuyResponseSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+    shipped_to_full = CitySerializer(many=True, source='shipped_to', required=False, read_only=True)
+    # shipped_to_id = serializers.PrimaryKeyRelatedField(required=False, many=True, source='shipped_to', read_only=True)
+
+    class Meta:
+        model = BuyResponse
+        fields = ('id',
+                  'buy_request',
+                  'is_deal',
+                  'created_by',
+                  'comments',
+                  'company',
+                  'category',
+                  'brand',
+                  'model',
+                  'description',
+                  'min_quantity',
+                  'unit_of_measure',
+                  'price_in_inr',
+                  'new',
+                  'refurbished',
+                  'warranty',
+                  'delivery_date',
+                  'shipped_to',
+                  'shipped_to_full',
+                  'saleItem',
+                  'box_contents'
+                  )
+
+    def validate(self, data):
+        print data
+        return data
+
+    def create(self, validated_data):
+        print validated_data
+        # print validated_data.pop('delivery_date')
+        user = validated_data['created_by']
+        validated_data['company'] = user.company
+        shipped_to = validated_data.pop('shipped_to')
+        buy_request = BuyResponse.objects.create(**validated_data)
+        buy_request.company_id = user.company.id
+        buy_request.shipped_to = shipped_to
+        buy_request.save()
+        return buy_request
